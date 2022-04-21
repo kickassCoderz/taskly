@@ -70,25 +70,36 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
                 let result
 
-                if (existingTask) {
-                    result = await appwriteDatabase.updateDocument(
-                        'tasks',
-                        existingTask.$id,
-                        task,
-                        defaultPermissionsRead,
-                        defaultPermissionsWrite
-                    )
-                } else {
-                    result = await appwriteDatabase.createDocument<Task>(
-                        'tasks',
-                        'unique()',
-                        task,
-                        defaultPermissionsRead,
-                        defaultPermissionsWrite
-                    )
-                }
+                switch (action) {
+                    case 'deleted':
+                        if (!existingTask) {
+                            throwError('not found', 404)
+                        }
 
-                return res.status(201).json(result)
+                        await appwriteDatabase.deleteDocument('tasks', existingTask.$id)
+
+                        return res.status(204).json(null)
+                    default:
+                        if (existingTask) {
+                            result = await appwriteDatabase.updateDocument(
+                                'tasks',
+                                existingTask.$id,
+                                task,
+                                defaultPermissionsRead,
+                                defaultPermissionsWrite
+                            )
+                        } else {
+                            result = await appwriteDatabase.createDocument<Task>(
+                                'tasks',
+                                'unique()',
+                                task,
+                                defaultPermissionsRead,
+                                defaultPermissionsWrite
+                            )
+                        }
+
+                        return res.status(201).json(result)
+                }
             }
             default:
                 throwError('method not allowed', 405)
