@@ -24,8 +24,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             throwError('bad request', 403)
         }
 
+        // TODO authenticate github
+        // https://docs.github.com/en/developers/webhooks-and-events/webhooks/securing-your-webhooks
+
         switch (req.method) {
             case 'POST': {
+                // init ping is triggered when adding a webhook
+                const isInit = !!req.body.zen
+
+                if (isInit) {
+                    return res.status(201).json({ message: 'ok' })
+                }
+
                 const issue = req.body.issue
 
                 if (!issue) {
