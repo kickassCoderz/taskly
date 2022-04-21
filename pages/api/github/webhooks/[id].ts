@@ -47,7 +47,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     content: issue.body,
                     link: issue.html_url,
                     status: 'open',
-                    providerId: issue.id.toString()
+                    providerId: issue.id.toString(),
+                    provider: 'github'
                 }
 
                 const result = await appwriteDatabse.createDocument<

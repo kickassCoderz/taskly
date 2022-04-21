@@ -43,7 +43,9 @@ const HomePage = () => {
     const { data: tasks, isLoading } = useQuery(
         ['tasks'],
         () => {
-            return appwrite.database.listDocuments<Models.Document & { title: string; content: string }>('tasks')
+            return appwrite.database.listDocuments<
+                Models.Document & { title: string; content: string; link: string; provider: string }
+            >('tasks')
         },
         { enabled: !!session }
     )
@@ -138,6 +140,7 @@ const HomePage = () => {
                     <Table.Column>ID</Table.Column>
                     <Table.Column>TITLE</Table.Column>
                     <Table.Column>CONTENT</Table.Column>
+                    <Table.Column>LINK</Table.Column>
                 </Table.Header>
                 <Table.Body loadingState={!tasks && isLoading}>
                     {tasks?.documents?.map(task => (
@@ -145,6 +148,16 @@ const HomePage = () => {
                             <Table.Cell>{task.$id}</Table.Cell>
                             <Table.Cell>{task.title}</Table.Cell>
                             <Table.Cell>{task.content?.substring(0, 32)}</Table.Cell>
+                            {!!task.link && (
+                                <Table.Cell>
+                                    <a
+                                        target="_blank"
+                                        title="Open original issue"
+                                        href={task.link}
+                                        rel="noreferrer"
+                                    >{`${task.provider || 'original'} issue`}</a>
+                                </Table.Cell>
+                            )}
                         </Table.Row>
                     ))}
                 </Table.Body>
