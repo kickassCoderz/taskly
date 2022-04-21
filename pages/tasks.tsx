@@ -10,10 +10,10 @@ const gitHubRepositoryUrl = 'https://api.github.com/repos/capjavert/pucko/hooks'
 
 const HomePage = () => {
     const appwrite = useAppwrite()
-    const [session, setSession] = useState<Models.Session>()
 
-    useEffect(() => {
-        const createSession = async () => {
+    const { data: session } = useQuery<Models.Session | undefined>(
+        'session',
+        async () => {
             let { sessions } = await appwrite.account.getSessions().catch(error => {
                 console.error(error)
 
@@ -22,21 +22,20 @@ const HomePage = () => {
             sessions = Object.values(sessions)
 
             if (!sessions.find(item => item.provider === 'github')) {
-                await appwrite.account.createOAuth2Session(
-                    'github',
-                    window.location.toString(),
-                    window.location.toString(),
-                    ['user:email', 'admin:repo_hook']
-                )
+                appwrite.account.createOAuth2Session('github', window.location.toString(), window.location.toString(), [
+                    'user:email',
+                    'admin:repo_hook'
+                ])
+
+                return undefined
             }
 
             const currentSession = sessions[0]
 
-            setSession(currentSession)
-        }
-
-        createSession()
-    }, [appwrite])
+            return currentSession
+        },
+        { enabled: !!appwrite }
+    )
 
     const queryClient = useQueryClient()
 
@@ -68,15 +67,15 @@ const HomePage = () => {
                 return undefined
             }
 
-            const webhookUrl = `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session?.userId}`
+            const webhookUrl = `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session.userId}`
             const webhookSecret = (Math.random() + 1).toString(36).substring(2) // TODO maybe some other secret generation method
 
             const result = await fetch(gitHubRepositoryUrl, {
                 method: 'POST',
-                headers: { authorization: `token ${session?.providerAccessToken}` },
+                headers: { authorization: `token ${session.providerAccessToken}` },
                 body: JSON.stringify({
                     config: {
-                        url: `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session?.userId}`,
+                        url: `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session.userId}`,
                         content_type: 'json',
                         secret: webhookSecret
                     },
