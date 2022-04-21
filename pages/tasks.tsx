@@ -51,9 +51,16 @@ const HomePage = () => {
     const { data: githubWebhooks } = useQuery(
         ['webhooks', 'github'],
         () => {
+            if (!session) {
+                return undefined
+            }
+
             return appwrite.database.listDocuments<Models.Document & { provider: string }>(
                 'webhooks',
-                [Query.equal('provider', 'github')],
+                [
+                    Query.equal('provider', 'github'),
+                    Query.equal('url', `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session.userId}`)
+                ],
                 1
             )
         },

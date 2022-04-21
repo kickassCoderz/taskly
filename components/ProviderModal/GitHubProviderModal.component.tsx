@@ -48,7 +48,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
     const { data: githubWebhooks, isLoading: isConnectedMapLoading } = useQuery(
         ['webhooks', 'github', { resourceId: repositoriesToSearch }],
         () => {
-            return appwrite.database.listDocuments<Models.Document & { resourceId: string }>('webhooks', [
+            return appwrite.database.listDocuments<Models.Document & { resourceId: string; url: string }>('webhooks', [
                 Query.equal('resourceId', repositoriesToSearch)
             ])
         },
@@ -56,17 +56,19 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
     )
 
     const isConnectedMap = useMemo<Record<string, boolean>>(() => {
-        if (!githubWebhooks) {
+        if (!githubWebhooks || !session) {
             return {}
         }
+
+        const webhookUrl = `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session.userId}`
 
         return githubWebhooks?.documents.reduce((acc, item) => {
             return {
                 ...acc,
-                [item.resourceId]: true
+                [item.resourceId]: item.url === webhookUrl
             }
         }, {})
-    }, [githubWebhooks])
+    }, [githubWebhooks, session])
 
     const { mutate: connectWithGitHub, isLoading: isConnectingWithGitHub } = useMutation({
         mutationFn: async (repository: { id: number; full_name: string }) => {
