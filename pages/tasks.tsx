@@ -1,5 +1,5 @@
 import { Button, Text, Container, Table } from '@nextui-org/react'
-import { Models } from 'appwrite'
+import { Models, Query } from 'appwrite'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
@@ -48,26 +48,17 @@ const HomePage = () => {
         { enabled: !!session }
     )
 
-    const { data: hasGitHubWebhook } = useQuery(
-        ['github', 'hooks', 'enabled'],
-        async () => {
-            if (!session) {
-                return undefined
-            }
-
-            const result: any[] = await fetch(gitHubRepositoryUrl, {
-                headers: { authorization: `token ${session?.providerAccessToken}` }
-            }).then(res => res.json())
-
-            return result.some(
-                item =>
-                    item.config.url === `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session?.userId}`
-            )
+    const { data: githubWebhooks } = useQuery(
+        ['webhooks', 'github'],
+        () => {
+            return appwrite.database.listDocuments<Models.Document & { provider: string }>('webhooks', [
+                Query.equal('provider', 'github')
+            ])
         },
-        {
-            enabled: !!session
-        }
+        { enabled: !!session }
     )
+
+    const isGitHubConnected = !!githubWebhooks?.documents.length
 
     const { mutate: connectWithGitHub, isLoading: isConnectingWithGitHub } = useMutation({
         mutationFn: async () => {
@@ -75,21 +66,41 @@ const HomePage = () => {
                 return undefined
             }
 
-            await fetch(gitHubRepositoryUrl, {
+            const webhookUrl = `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session?.userId}`
+            const webhookSecret = (Math.random() + 1).toString(36).substring(2) // TODO maybe some other secret generation method
+
+            const result = await fetch(gitHubRepositoryUrl, {
                 method: 'POST',
                 headers: { authorization: `token ${session?.providerAccessToken}` },
                 body: JSON.stringify({
                     config: {
                         url: `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session?.userId}`,
-                        content_type: 'json'
+                        content_type: 'json',
+                        secret: webhookSecret
                     },
                     events: ['issues'],
                     active: true
                 })
             }).then(res => res.json())
+
+            const webhook = await appwrite.database.createDocument('webhooks', 'unique()', {
+                provider: 'github',
+                userId: session.userId,
+                url: webhookUrl,
+                secret: webhookSecret,
+                providerId: result.id.toString(),
+                providerUrl: result.url
+            })
+
+            return webhook
         },
-        onSuccess: () => {
-            queryClient.setQueryData(['github', 'hooks', 'enabled'], true)
+        onSuccess: data => {
+            queryClient.setQueryData(['webhooks', 'github'], (current: any) => {
+                return {
+                    total: current?.total + 1,
+                    documents: [...current?.documents, data]
+                }
+            })
         }
     })
 
@@ -97,17 +108,23 @@ const HomePage = () => {
         <Container fluid>
             <Text h1>Tasks</Text>
 
-            {typeof hasGitHubWebhook !== 'undefined' && !hasGitHubWebhook && (
+            {typeof githubWebhooks !== 'undefined' && (
                 <Button
                     iconRight={<Image width="20" height="20" src="/github.svg" alt="Connect GitHub" />}
                     color="primary"
                     ghost
                     disabled={!session || isConnectingWithGitHub}
                     onClick={() => {
+                        if (isGitHubConnected) {
+                            alert('TODO manage modal')
+
+                            return
+                        }
+
                         connectWithGitHub()
                     }}
                 >
-                    Connect GitHub
+                    {isGitHubConnected ? 'Manage' : 'Connect'} GitHub
                 </Button>
             )}
             <Table
