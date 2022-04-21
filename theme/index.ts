@@ -1,5 +1,3 @@
-// export { default as lightTheme } from './lightTheme'
-// export { default as darkTheme } from './darkTheme'
 import lightTheme from './lightTheme'
 import darkTheme from './darkTheme'
 
