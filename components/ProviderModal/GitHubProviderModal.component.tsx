@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { Models, Query } from 'appwrite'
 import { useAppwrite } from '../../hooks'
 
-const githubPaginationRegex = /=(?<next>[0-9]{1,})>; rel="next", .*=(?<last>[0-9]{1,})>; rel="last"/
+const githubPaginationRegex = /<.*page=(?<last>[0-9]{1,}).*>; rel="last"/
 
 const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     const queryClient = useQueryClient()
@@ -15,13 +15,13 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
     const appwrite = useAppwrite()
 
     const { data: repositories, isLoading } = useQuery(
-        ['github', 'repositories', page],
+        ['github', 'repositories', { page, type: 'owner' }],
         async () => {
             if (!session) {
                 return undefined
             }
 
-            const response = await fetch(`https://api.github.com/user/repos?page=${page}`, {
+            const response = await fetch(`https://api.github.com/user/repos?page=${page}&type=owner`, {
                 headers: { authorization: `token ${session.providerAccessToken}` }
             })
 
@@ -211,7 +211,6 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                     <Table.Pagination
                         noMargin
                         align="center"
-                        rowsPerPage={30}
                         onPageChange={page => {
                             setPage(page)
                         }}
