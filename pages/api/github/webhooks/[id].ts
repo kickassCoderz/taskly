@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { Client, Database, Models } from 'node-appwrite'
+import { Client, Database, Models, Query } from 'node-appwrite'
 
 const appwriteClient = new Client()
-const appwriteDatabse = new Database(appwriteClient)
+const appwriteDatabase = new Database(appwriteClient)
 
 appwriteClient
     .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT as string)
@@ -14,6 +14,14 @@ const throwError = (message: string, statusCode = 500) => {
     error.statusCode = statusCode
 
     throw error
+}
+
+type Task = Models.Document & {
+    id: string
+    content: string
+    url: string
+    status: string
+    providerId: string
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -36,30 +44,49 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     return res.status(201).json({ message: 'ok' })
                 }
 
+                const action = req.body.action
                 const issue = req.body.issue
 
-                if (!issue) {
+                if (![action, issue].every(Boolean)) {
                     throwError('bad request', 403)
                 }
 
+                const existingTask = (
+                    await appwriteDatabase.listDocuments('tasks', [Query.equal('providerId', issue.id.toString())])
+                )?.documents?.[0]
+
                 const task = {
+                    ...existingTask,
                     title: issue.title,
                     content: issue.body,
                     link: issue.html_url,
-                    status: 'open',
+                    status: issue.state,
                     providerId: issue.id.toString(),
                     provider: 'github'
                 }
 
-                const result = await appwriteDatabse.createDocument<
-                    Models.Document & {
-                        id: string
-                        content: string
-                        url: string
-                        status: string
-                        providerId: string
-                    }
-                >('tasks', 'unique()', task, [`user:${id}`], [`user:${id}`])
+                const defaultPermissionsRead = [`user:${id}`]
+                const defaultPermissionsWrite = [`user:${id}`]
+
+                let result
+
+                if (existingTask) {
+                    result = await appwriteDatabase.updateDocument(
+                        'tasks',
+                        existingTask.$id,
+                        task,
+                        defaultPermissionsRead,
+                        defaultPermissionsWrite
+                    )
+                } else {
+                    result = await appwriteDatabase.createDocument<Task>(
+                        'tasks',
+                        'unique()',
+                        task,
+                        defaultPermissionsRead,
+                        defaultPermissionsWrite
+                    )
+                }
 
                 return res.status(201).json(result)
             }
