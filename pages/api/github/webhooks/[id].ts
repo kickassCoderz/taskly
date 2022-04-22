@@ -29,7 +29,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const { id } = req.query
 
         if (!id) {
-            throwError('bad request', 403)
+            throwError('bad request', 400)
         }
 
         // TODO authenticate github
@@ -48,7 +48,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 const issue = req.body.issue
 
                 if (![action, issue].every(Boolean)) {
-                    throwError('bad request', 403)
+                    throwError('bad request', 400)
                 }
 
                 const existingTask = (
@@ -58,7 +58,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 const task = {
                     ...existingTask,
                     title: issue.title,
-                    content: issue.body,
+                    content: issue.body || '',
                     link: issue.html_url,
                     status: issue.state,
                     providerId: issue.id.toString(),

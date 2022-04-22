@@ -1,7 +1,7 @@
 import { Button, Text, Container, Table, Link } from '@nextui-org/react'
 import { Models, Query } from 'appwrite'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQuery, useQueryClient } from 'react-query'
 import { GitHubProviderModal } from '../components'
 import { useAppwrite } from '../hooks'
@@ -43,7 +43,7 @@ const HomePage = () => {
         () => {
             return appwrite.database.listDocuments<
                 Models.Document & { title: string; content: string; link: string; provider: string }
-            >('tasks')
+            >('tasks', [], 100, 0, undefined, undefined, undefined, ['DESC'])
         },
         { enabled: !!session }
     )
@@ -68,6 +68,61 @@ const HomePage = () => {
     )
 
     const isGitHubConnected = !!githubWebhooks?.documents.length
+
+    useEffect(() => {
+        const unsubscribe = appwrite.subscribe(
+            'collections.tasks.documents',
+            ({ event, payload }: { event: string; payload: Models.Document }) => {
+                switch (event) {
+                    case 'database.documents.create':
+                        queryClient.setQueryData<Models.DocumentList<Models.Document>>(['tasks'], current => {
+                            const newDocuments = [payload, ...(current?.documents || [])]
+
+                            return {
+                                total: newDocuments.length,
+                                documents: newDocuments
+                            }
+                        })
+                        break
+                    case 'database.documents.update':
+                        queryClient.setQueryData<Models.DocumentList<Models.Document>>(['tasks'], current => {
+                            const newDocuments =
+                                current?.documents?.map(item => {
+                                    if (item.$id === payload.$id) {
+                                        return payload
+                                    }
+
+                                    return item
+                                }) || []
+
+                            return {
+                                total: newDocuments.length,
+                                documents: newDocuments
+                            }
+                        })
+                        break
+                    case 'database.documents.delete':
+                        queryClient.setQueryData<Models.DocumentList<Models.Document>>(['tasks'], current => {
+                            const newDocuments = current?.documents?.filter(item => item.$id !== payload.$id) || []
+
+                            return {
+                                total: newDocuments.length,
+                                documents: newDocuments
+                            }
+                        })
+                        break
+                    default:
+                        console.error('unknown event', event)
+
+                        break
+                }
+            }
+        )
+
+        return () => {
+            unsubscribe()
+        }
+    }, [appwrite, queryClient])
 
     return (
         <>

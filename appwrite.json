@@ -169,5 +169,18 @@
                 }
             ]
         }
+    ],
+    "functions": [
+        {
+            "$id": "github-issues-import",
+            "name": "github-issues-import",
+            "runtime": "node-16.0",
+            "path": "functions/github-issues-import",
+            "entrypoint": "src/index.js",
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
     ]
 }

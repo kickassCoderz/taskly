@@ -103,6 +103,12 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                 resourceId: repository.id.toString()
             })
 
+            await appwrite.functions.createExecution(
+                'github-issues-import',
+                JSON.stringify({ webhook, pT: session.providerAccessToken }),
+                true
+            )
+
             return webhook
         },
         onSuccess: data => {
