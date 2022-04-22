@@ -88,6 +88,12 @@ module.exports = async (req, res) => {
         let errors = []
 
         for (const issue of issues) {
+            if (issue.pull_request) {
+                // issue is a pull request so skip the import
+
+                continue
+            }
+
             const existingTask = (
                 await database.listDocuments('tasks', [sdk.Query.equal('providerId', issue.id.toString())])
             )?.documents?.[0]
