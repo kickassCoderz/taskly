@@ -85,7 +85,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                 headers: { authorization: `token ${session.providerAccessToken}` },
                 body: JSON.stringify({
                     config: {
-                        url: `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session.userId}`,
+                        url: webhookUrl,
                         content_type: 'json',
                         secret: webhookSecret
                     },
@@ -106,12 +106,15 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             return webhook
         },
         onSuccess: data => {
-            queryClient.setQueryData(['webhooks', 'github', { resourceId: repositoriesToSearch }], (current: any) => {
+            const updater = (current: any) => {
                 return {
-                    total: current?.total + 1,
-                    documents: [...current?.documents, data]
+                    total: (current?.total || 0) + 1,
+                    documents: [...(current?.documents || []), data]
                 }
-            })
+            }
+
+            queryClient.setQueryData(['webhooks', 'github', { resourceId: repositoriesToSearch }], updater)
+            queryClient.setQueryData(['webhooks', 'github'], updater)
         }
     })
 
