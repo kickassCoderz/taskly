@@ -172,7 +172,7 @@
     ],
     "functions": [
         {
-            "$id": "6262b6d84a115f1cd27d",
+            "$id": "github-issues-import",
             "name": "github-issues-import",
             "runtime": "node-16.0",
             "path": "functions/github-issues-import",
