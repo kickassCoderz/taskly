@@ -58,7 +58,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 const task = {
                     ...existingTask,
                     title: issue.title,
-                    content: issue.body,
+                    content: issue.body || '',
                     link: issue.html_url,
                     status: issue.state,
                     providerId: issue.id.toString(),
