@@ -180,7 +180,18 @@
             "execute": [],
             "events": [],
             "schedule": "",
-            "timeout": 15
+            "timeout": 600
+        },
+        {
+            "$id": "gitlab-issues-import",
+            "name": "gitlab-issues-import",
+            "runtime": "node-16.0",
+            "path": "functions/gitlab-issues-import",
+            "entrypoint": "src/index.js",
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 600
         }
     ]
 }

@@ -1,38 +1,42 @@
 import React, { useMemo, useState } from 'react'
-import { Modal, Button, Text, Table, Link, Container } from '@nextui-org/react'
+import { Modal, Button, Text, Table, Link, Container, Input } from '@nextui-org/react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { Models, Query } from 'appwrite'
 import { useAppwrite } from '../../hooks'
 import Image from 'next/image'
 
-const paginationRegex = /<.*page=(?<last>[0-9]{1,}).*>; rel="last"/
-
 const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     const queryClient = useQueryClient()
     const session: Models.Session | undefined = queryClient
         .getQueryData<Models.Session[]>(['session'])
-        ?.find(item => item.provider === 'github')
+        ?.find(item => item.provider === 'gitlab')
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [total, setTotal] = useState(0)
     const appwrite = useAppwrite()
 
     const { data: repositories, isLoading } = useQuery(
-        ['github', 'repositories', { page, type: 'owner' }],
+        ['gitlab', 'repositories', { page, owned: true, perPage: 30, search }],
         async () => {
             if (!session) {
                 return undefined
             }
 
-            const response = await fetch(`https://api.github.com/user/repos?page=${page}&type=owner`, {
-                headers: { authorization: `token ${session.providerAccessToken}` }
-            })
+            const response = await fetch(
+                `https://gitlab.com/api/v4/projects?page=${page}&owned=true&per_page=30&search=${search}`,
+                {
+                    headers: {
+                        authorization: `Bearer ${session.providerAccessToken}`,
+                        'content-type': 'application/json'
+                    }
+                }
+            )
 
-            const { last } = response.headers.get('link')?.match(paginationRegex)?.groups || {}
+            const total = response.headers.get('x-total-pages')
             const result: any[] = await response.json()
 
-            if (last) {
-                setTotal(+last)
+            if (total) {
+                setTotal(+total)
             }
 
             return result
@@ -49,7 +53,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
     )
 
     const { data: webhooks, isLoading: isConnectedMapLoading } = useQuery(
-        ['webhooks', 'github', { resourceId: repositoriesToSearch }],
+        ['webhooks', 'gitlab', { resourceId: repositoriesToSearch }],
         () => {
             return appwrite.database.listDocuments<Models.Document & { resourceId: string; url: string }>('webhooks', [
                 Query.equal('resourceId', repositoriesToSearch)
@@ -63,7 +67,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             return {}
         }
 
-        const webhookUrl = `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session.userId}`
+        const webhookUrl = `${process.env.NEXT_PUBLIC_TASKLY_GITLAB_WEBHOOK_ENDPOINT}/${session.userId}`
 
         return webhooks?.documents.reduce((acc, item) => {
             return {
@@ -74,31 +78,33 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
     }, [webhooks, session])
 
     const { mutate: connectRepository, isLoading: isConnectingRepository } = useMutation({
-        mutationFn: async (repository: { id: number; full_name: string }) => {
+        mutationFn: async (repository: { id: number; path_with_namespace: string }) => {
             if (!session) {
                 return undefined
             }
 
-            const repositoryUrl = `https://api.github.com/repos/${repository.full_name}/hooks`
-            const webhookUrl = `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session.userId}`
+            const repositoryUrl = `https://gitlab.com/api/v4/projects/${encodeURIComponent(
+                repository.path_with_namespace
+            )}/hooks`
+            const webhookUrl = `${process.env.NEXT_PUBLIC_TASKLY_GITLAB_WEBHOOK_ENDPOINT}/${session.userId}`
             const webhookSecret = (Math.random() + 1).toString(36).substring(2) // TODO maybe some other secret generation method
 
             const result = await fetch(repositoryUrl, {
                 method: 'POST',
-                headers: { authorization: `token ${session.providerAccessToken}` },
+                headers: {
+                    authorization: `Bearer ${session.providerAccessToken}`,
+                    'content-type': 'application/json'
+                },
                 body: JSON.stringify({
-                    config: {
-                        url: webhookUrl,
-                        content_type: 'json',
-                        secret: webhookSecret
-                    },
-                    events: ['issues'],
-                    active: true
+                    url: webhookUrl,
+                    token: webhookSecret,
+                    issues_events: true,
+                    push_events: false
                 })
             }).then(res => res.json())
 
             const webhook = await appwrite.database.createDocument('webhooks', 'unique()', {
-                provider: 'github',
+                provider: 'gitlab',
                 userId: session.userId,
                 url: webhookUrl,
                 secret: webhookSecret,
@@ -107,7 +113,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             })
 
             await appwrite.functions.createExecution(
-                'github-issues-import',
+                'gitlab-issues-import',
                 JSON.stringify({ webhook, pT: session.providerAccessToken }),
                 true
             )
@@ -122,8 +128,8 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                 }
             }
 
-            queryClient.setQueryData(['webhooks', 'github', { resourceId: repositoriesToSearch }], updater)
-            queryClient.setQueryData(['webhooks', 'github'], updater)
+            queryClient.setQueryData(['webhooks', 'gitlab', { resourceId: repositoriesToSearch }], updater)
+            queryClient.setQueryData(['webhooks', 'gitlab'], updater)
         }
     })
 
@@ -141,23 +147,21 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
         >
             <Modal.Header>
                 <Container display="flex" direction="row">
-                    <Image width="20" height="20" src="/github.svg" alt="Connect GitHub" />
+                    <Image width="20" height="20" src="/gitlab.svg" alt="Connect GitLab" />
                     <Text id="modal-title" size={18}>
-                        GitHub connection
+                        GitLab connection
                     </Text>
                 </Container>
             </Modal.Header>
             <Modal.Body>
-                {/* <Input
+                <Input
                     type="search"
                     placeholder="Search repositories"
                     value={search}
                     onChange={event => {
                         setSearch(event.target.value || '')
-
-                        // TODO actually search
                     }}
-                /> */}
+                />
                 <Table
                     fixed
                     aria-label="Example table with static content"
@@ -180,7 +184,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                                     <Table.Cell>
                                         <Link
                                             target="_blank"
-                                            href={repository.html_url}
+                                            href={repository.web_url}
                                             title={repository.name}
                                             rel="noreferrer"
                                             color="text"

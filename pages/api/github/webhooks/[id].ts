@@ -51,6 +51,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     throwError('bad request', 400)
                 }
 
+                if (issue.pull_request) {
+                    // issue is a pull request so skip it
+
+                    return res.status(201).json({ message: 'ok' })
+                }
+
                 const existingTask = (
                     await appwriteDatabase.listDocuments('tasks', [Query.equal('providerId', issue.id.toString())])
                 )?.documents?.[0]
