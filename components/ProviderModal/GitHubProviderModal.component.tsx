@@ -8,7 +8,7 @@ const githubPaginationRegex = /<.*page=(?<last>[0-9]{1,}).*>; rel="last"/
 
 const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     const queryClient = useQueryClient()
-    const session: Models.Session | undefined = queryClient.getQueryData(['session'])
+    const session: Models.Session | undefined = queryClient.getQueryData<Models.Session[]>(['session'])?.[0]
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [total, setTotal] = useState(0)

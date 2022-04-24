@@ -8,9 +8,10 @@ import { useAppwrite } from '../hooks'
 
 const HomePage = () => {
     const appwrite = useAppwrite()
-    const [isProviderModalOpen, setProviderModalOpen] = useState(false)
+    const [isGitHubProviderModalOpen, setGitHubProviderModalOpen] = useState(false)
+    const [isGitLabProviderModalOpen, setGitLabProviderModalOpen] = useState(false)
 
-    const { data: session } = useQuery<Models.Session | undefined>(
+    const { data: sessions } = useQuery<Models.Session[] | undefined>(
         'session',
         async () => {
             let { sessions } = await appwrite.account.getSessions().catch(error => {
@@ -20,21 +21,11 @@ const HomePage = () => {
             })
             sessions = Object.values(sessions)
 
-            if (!sessions.find(item => item.provider === 'github')) {
-                appwrite.account.createOAuth2Session('github', window.location.toString(), window.location.toString(), [
-                    'user:email',
-                    'repo'
-                ])
-
-                return undefined
-            }
-
-            const currentSession = sessions[0]
-
-            return currentSession
+            return sessions
         },
         { enabled: !!appwrite }
     )
+    const session = sessions?.[0]
 
     const queryClient = useQueryClient()
 
@@ -67,7 +58,27 @@ const HomePage = () => {
         { enabled: !!session }
     )
 
+    const { data: gitlabWebhooks } = useQuery(
+        ['webhooks', 'gitlab'],
+        () => {
+            if (!session) {
+                return undefined
+            }
+
+            return appwrite.database.listDocuments<Models.Document & { provider: string }>(
+                'webhooks',
+                [
+                    Query.equal('provider', 'gitlab'),
+                    Query.equal('url', `${process.env.NEXT_PUBLIC_TASKLY_GITLAB_WEBHOOK_ENDPOINT}/${session.userId}`)
+                ],
+                1
+            )
+        },
+        { enabled: !!session }
+    )
+
     const isGitHubConnected = !!githubWebhooks?.documents.length
+    const isGitLabConnected = !!gitlabWebhooks?.documents.length
 
     useEffect(() => {
         const unsubscribe = appwrite.subscribe(
@@ -128,20 +139,52 @@ const HomePage = () => {
         <>
             <Container fluid>
                 <Text h1>Tasks</Text>
-
-                {typeof githubWebhooks !== 'undefined' && (
-                    <Button
-                        iconRight={<Image width="20" height="20" src="/github.svg" alt="Connect GitHub" />}
-                        color="primary"
-                        ghost
-                        disabled={!session}
-                        onClick={() => {
-                            setProviderModalOpen(true)
-                        }}
-                    >
-                        {isGitHubConnected ? 'Manage' : 'Connect'} GitHub
-                    </Button>
-                )}
+                <Container display="flex" direction="row">
+                    {typeof githubWebhooks !== 'undefined' && (
+                        <Button
+                            iconRight={<Image width="20" height="20" src="/github.svg" alt="Connect GitHub" />}
+                            color="primary"
+                            ghost
+                            disabled={!session}
+                            onClick={() => {
+                                if (!sessions?.find(item => item.provider === 'github')) {
+                                    appwrite.account.createOAuth2Session(
+                                        'github',
+                                        window.location.toString(),
+                                        window.location.toString(),
+                                        ['user:email', 'repo']
+                                    )
+                                } else {
+                                    setGitHubProviderModalOpen(true)
+                                }
+                            }}
+                        >
+                            {isGitHubConnected ? 'Manage' : 'Connect'} GitHub
+                        </Button>
+                    )}
+                    {typeof gitlabWebhooks !== 'undefined' && (
+                        <Button
+                            iconRight={<Image width="20" height="20" src="/gitlab.svg" alt="Connect GitLab" />}
+                            color="primary"
+                            ghost
+                            disabled={!session}
+                            onClick={() => {
+                                if (!sessions?.find(item => item.provider === 'gitlab')) {
+                                    appwrite.account.createOAuth2Session(
+                                        'gitlab',
+                                        window.location.toString(),
+                                        window.location.toString(),
+                                        ['read_user', 'api']
+                                    )
+                                } else {
+                                    setGitLabProviderModalOpen(true)
+                                }
+                            }}
+                        >
+                            {isGitLabConnected ? 'Manage' : 'Connect'} GitLab
+                        </Button>
+                    )}
+                </Container>
                 <Table
                     aria-label="Example table with static content"
                     css={{
@@ -176,7 +219,8 @@ const HomePage = () => {
                     </Table.Body>
                 </Table>
             </Container>
-            <GitHubProviderModal isOpen={isProviderModalOpen} onClose={() => setProviderModalOpen(false)} />
+            <GitHubProviderModal isOpen={isGitHubProviderModalOpen} onClose={() => setGitHubProviderModalOpen(false)} />
+            {/* TODO GitLabProviderModal <GitHubProviderModal isOpen={isGitLabProviderModalOpen} onClose={() => setGitLabProviderModalOpen(false)} /> */}
         </>
     )
 }
