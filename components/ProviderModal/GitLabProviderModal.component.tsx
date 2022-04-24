@@ -112,12 +112,11 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                 resourceId: repository.id.toString()
             })
 
-            // TODO implement function
-            // await appwrite.functions.createExecution(
-            //     'gitlab-issues-import',
-            //     JSON.stringify({ webhook, pT: session.providerAccessToken }),
-            //     true
-            // )
+            await appwrite.functions.createExecution(
+                'gitlab-issues-import',
+                JSON.stringify({ webhook, pT: session.providerAccessToken }),
+                true
+            )
 
             return webhook
         },
