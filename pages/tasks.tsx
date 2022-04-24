@@ -3,7 +3,7 @@ import { Models, Query } from 'appwrite'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useQuery, useQueryClient } from 'react-query'
-import { GitHubProviderModal } from '../components'
+import { GitHubProviderModal, GitLabProviderModal } from '../components'
 import { useAppwrite } from '../hooks'
 
 const HomePage = () => {
@@ -220,7 +220,7 @@ const HomePage = () => {
                 </Table>
             </Container>
             <GitHubProviderModal isOpen={isGitHubProviderModalOpen} onClose={() => setGitHubProviderModalOpen(false)} />
-            {/* TODO GitLabProviderModal <GitHubProviderModal isOpen={isGitLabProviderModalOpen} onClose={() => setGitLabProviderModalOpen(false)} /> */}
+            <GitLabProviderModal isOpen={isGitLabProviderModalOpen} onClose={() => setGitLabProviderModalOpen(false)} />
         </>
     )
 }
