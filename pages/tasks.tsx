@@ -164,6 +164,9 @@ const HomePage = () => {
                     )}
                     {typeof gitlabWebhooks !== 'undefined' && (
                         <Button
+                            css={{
+                                marginLeft: 20
+                            }}
                             iconRight={<Image width="20" height="20" src="/gitlab.svg" alt="Connect GitLab" />}
                             color="primary"
                             ghost
