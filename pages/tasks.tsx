@@ -1,6 +1,7 @@
 import { Button, Text, Container, Table, Link } from '@nextui-org/react'
 import { Models, Query } from 'appwrite'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useQuery, useQueryClient } from 'react-query'
 import { GitHubProviderModal, GitLabProviderModal } from '../components'
@@ -133,25 +134,65 @@ const HomePage = () => {
         return () => {
             unsubscribe()
         }
-    }, [appwrite, queryClient])
+    }, [appwrite, queryClient, sessions])
+
+    const router = useRouter()
+
+    useEffect(() => {
+        const manageParam = router.query.manage
+
+        if (!manageParam) {
+            return
+        }
+
+        if (sessions?.some(item => item.provider === manageParam)) {
+            const queryWithoutManage = { ...router.query }
+            delete queryWithoutManage.manage
+
+            router.replace(
+                {
+                    pathname: router.pathname,
+                    query: queryWithoutManage
+                },
+                undefined,
+                {
+                    shallow: true
+                }
+            )
+
+            switch (manageParam) {
+                case 'github':
+                    setGitHubProviderModalOpen(true)
+                    break
+                case 'gitlab':
+                    setGitLabProviderModalOpen(true)
+                    break
+                default:
+                    break
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [router.query.manage, sessions])
 
     return (
         <>
             <Container fluid>
                 <Text h1>Tasks</Text>
                 <Container display="flex" direction="row">
-                    {typeof githubWebhooks !== 'undefined' && (
+                    {(!session || typeof githubWebhooks !== 'undefined') && (
                         <Button
                             iconRight={<Image width="20" height="20" src="/github.svg" alt="Connect GitHub" />}
                             color="primary"
                             ghost
-                            disabled={!session}
                             onClick={() => {
                                 if (!sessions?.find(item => item.provider === 'github')) {
+                                    const redirectUrl = new URL(window.location.toString())
+                                    redirectUrl.searchParams.append('manage', 'github')
+
                                     appwrite.account.createOAuth2Session(
                                         'github',
-                                        window.location.toString(),
-                                        window.location.toString(),
+                                        redirectUrl.toString(),
+                                        redirectUrl.toString(),
                                         ['user:email', 'repo']
                                     )
                                 } else {
@@ -162,7 +203,7 @@ const HomePage = () => {
                             {isGitHubConnected ? 'Manage' : 'Connect'} GitHub
                         </Button>
                     )}
-                    {typeof gitlabWebhooks !== 'undefined' && (
+                    {(!session || typeof gitlabWebhooks !== 'undefined') && (
                         <Button
                             css={{
                                 marginLeft: 20
@@ -170,13 +211,15 @@ const HomePage = () => {
                             iconRight={<Image width="20" height="20" src="/gitlab.svg" alt="Connect GitLab" />}
                             color="primary"
                             ghost
-                            disabled={!session}
                             onClick={() => {
                                 if (!sessions?.find(item => item.provider === 'gitlab')) {
+                                    const redirectUrl = new URL(window.location.toString())
+                                    redirectUrl.searchParams.append('manage', 'gitlab')
+
                                     appwrite.account.createOAuth2Session(
                                         'gitlab',
-                                        window.location.toString(),
-                                        window.location.toString(),
+                                        redirectUrl.toString(),
+                                        redirectUrl.toString(),
                                         ['read_user', 'api']
                                     )
                                 } else {
