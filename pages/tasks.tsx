@@ -20,7 +20,24 @@ const HomePage = () => {
 
                 return { sessions: [] }
             })
-            sessions = Object.values(sessions)
+
+            sessions = await Promise.all(
+                Object.values(sessions).map(async item => {
+                    if (item.providerRefreshToken) {
+                        const expiryTimestamp = item.providerAccessTokenExpiry * 1000
+
+                        if (Date.now() > expiryTimestamp) {
+                            try {
+                                return await appwrite.account.updateSession(item.$id)
+                            } catch (error) {
+                                console.error(error)
+                            }
+                        }
+                    }
+
+                    return item
+                })
+            )
 
             return sessions
         },
