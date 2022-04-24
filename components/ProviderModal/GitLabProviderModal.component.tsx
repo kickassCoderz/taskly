@@ -25,7 +25,10 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             const response = await fetch(
                 `https://gitlab.com/api/v4/projects?page=${page}&owned=true&per_page=30&search=${search}`,
                 {
-                    headers: { authorization: `Bearer ${session.providerAccessToken}` }
+                    headers: {
+                        authorization: `Bearer ${session.providerAccessToken}`,
+                        'content-type': 'application/json'
+                    }
                 }
             )
 
@@ -75,27 +78,27 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
     }, [webhooks, session])
 
     const { mutate: connectRepository, isLoading: isConnectingRepository } = useMutation({
-        mutationFn: async (repository: { id: number; full_name: string }) => {
+        mutationFn: async (repository: { id: number; path_with_namespace: string }) => {
             if (!session) {
                 return undefined
             }
 
-            // TODO gitlab hooks endpoint
-            const repositoryUrl = `https://gitlab.com/api/v4/repos/${repository.full_name}/hooks`
+            const repositoryUrl = `https://gitlab.com/api/v4/projects/${encodeURIComponent(
+                repository.path_with_namespace
+            )}/hooks`
             const webhookUrl = `${process.env.NEXT_PUBLIC_TASKLY_GITLAB_WEBHOOK_ENDPOINT}/${session.userId}`
             const webhookSecret = (Math.random() + 1).toString(36).substring(2) // TODO maybe some other secret generation method
 
             const result = await fetch(repositoryUrl, {
                 method: 'POST',
-                headers: { authorization: `Bearer ${session.providerAccessToken}` },
+                headers: {
+                    authorization: `Bearer ${session.providerAccessToken}`,
+                    'content-type': 'application/json'
+                },
                 body: JSON.stringify({
-                    config: {
-                        url: webhookUrl,
-                        content_type: 'json',
-                        secret: webhookSecret
-                    },
-                    events: ['issues'],
-                    active: true
+                    url: webhookUrl,
+                    token: webhookSecret,
+                    issues_events: true
                 })
             }).then(res => res.json())
 
@@ -108,11 +111,12 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                 resourceId: repository.id.toString()
             })
 
-            await appwrite.functions.createExecution(
-                'gitlab-issues-import',
-                JSON.stringify({ webhook, pT: session.providerAccessToken }),
-                true
-            )
+            // TODO implement function
+            // await appwrite.functions.createExecution(
+            //     'gitlab-issues-import',
+            //     JSON.stringify({ webhook, pT: session.providerAccessToken }),
+            //     true
+            // )
 
             return webhook
         },
@@ -180,7 +184,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                                     <Table.Cell>
                                         <Link
                                             target="_blank"
-                                            href={repository.html_url}
+                                            href={repository.web_url}
                                             title={repository.name}
                                             rel="noreferrer"
                                             color="text"
