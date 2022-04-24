@@ -1,14 +1,17 @@
 import React, { useMemo, useState } from 'react'
-import { Modal, Button, Text, Table, Link } from '@nextui-org/react'
+import { Modal, Button, Text, Table, Link, Container } from '@nextui-org/react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { Models, Query } from 'appwrite'
 import { useAppwrite } from '../../hooks'
+import Image from 'next/image'
 
-const githubPaginationRegex = /<.*page=(?<last>[0-9]{1,}).*>; rel="last"/
+const paginationRegex = /<.*page=(?<last>[0-9]{1,}).*>; rel="last"/
 
 const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     const queryClient = useQueryClient()
-    const session: Models.Session | undefined = queryClient.getQueryData<Models.Session[]>(['session'])?.[0]
+    const session: Models.Session | undefined = queryClient
+        .getQueryData<Models.Session[]>(['session'])
+        ?.find(item => item.provider === 'github')
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [total, setTotal] = useState(0)
@@ -25,7 +28,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                 headers: { authorization: `token ${session.providerAccessToken}` }
             })
 
-            const { last } = response.headers.get('link')?.match(githubPaginationRegex)?.groups || {}
+            const { last } = response.headers.get('link')?.match(paginationRegex)?.groups || {}
             const result: any[] = await response.json()
 
             if (last) {
@@ -45,7 +48,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
         [repositories]
     )
 
-    const { data: githubWebhooks, isLoading: isConnectedMapLoading } = useQuery(
+    const { data: webhooks, isLoading: isConnectedMapLoading } = useQuery(
         ['webhooks', 'github', { resourceId: repositoriesToSearch }],
         () => {
             return appwrite.database.listDocuments<Models.Document & { resourceId: string; url: string }>('webhooks', [
@@ -56,31 +59,31 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
     )
 
     const isConnectedMap = useMemo<Record<string, boolean>>(() => {
-        if (!githubWebhooks || !session) {
+        if (!webhooks || !session) {
             return {}
         }
 
         const webhookUrl = `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session.userId}`
 
-        return githubWebhooks?.documents.reduce((acc, item) => {
+        return webhooks?.documents.reduce((acc, item) => {
             return {
                 ...acc,
                 [item.resourceId]: item.url === webhookUrl
             }
         }, {})
-    }, [githubWebhooks, session])
+    }, [webhooks, session])
 
-    const { mutate: connectWithGitHub, isLoading: isConnectingWithGitHub } = useMutation({
+    const { mutate: connectRepository, isLoading: isConnectingRepository } = useMutation({
         mutationFn: async (repository: { id: number; full_name: string }) => {
             if (!session) {
                 return undefined
             }
 
-            const gitHubRepositoryUrl = `https://api.github.com/repos/${repository.full_name}/hooks`
+            const repositoryUrl = `https://api.github.com/repos/${repository.full_name}/hooks`
             const webhookUrl = `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session.userId}`
             const webhookSecret = (Math.random() + 1).toString(36).substring(2) // TODO maybe some other secret generation method
 
-            const result = await fetch(gitHubRepositoryUrl, {
+            const result = await fetch(repositoryUrl, {
                 method: 'POST',
                 headers: { authorization: `token ${session.providerAccessToken}` },
                 body: JSON.stringify({
@@ -137,9 +140,12 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             onClose={onClose}
         >
             <Modal.Header>
-                <Text id="modal-title" size={18}>
-                    GitHub connection
-                </Text>
+                <Container display="flex" direction="row">
+                    <Image width="20" height="20" src="/github.svg" alt="Connect GitHub" />
+                    <Text id="modal-title" size={18}>
+                        GitHub connection
+                    </Text>
+                </Container>
             </Modal.Header>
             <Modal.Body>
                 {/* <Input
@@ -195,7 +201,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                                             ghost={!isConnected}
                                             disabled={isConnectedMapLoading}
                                             onClick={() => {
-                                                if (isConnectingWithGitHub) {
+                                                if (isConnectingRepository) {
                                                     return
                                                 }
 
@@ -205,7 +211,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                                                     return
                                                 }
 
-                                                connectWithGitHub(repository)
+                                                connectRepository(repository)
                                             }}
                                         >
                                             {isConnected ? '✔' : 'Connect'}
