@@ -98,7 +98,8 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                 body: JSON.stringify({
                     url: webhookUrl,
                     token: webhookSecret,
-                    issues_events: true
+                    issues_events: true,
+                    push_events: false
                 })
             }).then(res => res.json())
 
