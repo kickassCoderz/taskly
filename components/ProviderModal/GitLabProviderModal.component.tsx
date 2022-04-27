@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from 'react'
-import { Modal, Button, Text, Table, Link, Container, Input } from '@nextui-org/react'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { Button, Container, Input, Link, Modal, Table, Text } from '@nextui-org/react'
 import { Models, Query } from 'appwrite'
-import { useAppwrite } from '../../hooks'
 import Image from 'next/image'
+import React, { useMemo, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+
+import { useAppwrite } from '../../hooks'
 
 const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     const queryClient = useQueryClient()

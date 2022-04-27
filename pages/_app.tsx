@@ -1,10 +1,11 @@
-import type { AppProps } from 'next/app'
 import { NextUIProvider } from '@nextui-org/react'
+import type { AppProps } from 'next/app'
 import { ThemeProvider as NextThemeProvider } from 'next-themes'
-import { themeProviderValues } from '../theme'
 import { useState } from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
+
+import { themeProviderValues } from '../theme'
 
 const App = ({ Component, pageProps }: AppProps) => {
     const [queryClient] = useState(() => new QueryClient())

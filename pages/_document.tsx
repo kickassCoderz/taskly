@@ -1,5 +1,5 @@
-import NextDocument, { DocumentContext, Html, Head, Main, NextScript } from 'next/document'
 import { CssBaseline } from '@nextui-org/react'
+import NextDocument, { DocumentContext, Head, Html, Main, NextScript } from 'next/document'
 
 class Document extends NextDocument {
     static async getInitialProps(ctx: DocumentContext) {

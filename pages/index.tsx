@@ -1,4 +1,5 @@
-import { Button, Switch, Text, Container, Row, Col } from '@nextui-org/react'
+import { Button, Col, Container, Row, Switch, Text } from '@nextui-org/react'
+
 import { useTheme } from '../hooks'
 
 const HomePage = () => {
