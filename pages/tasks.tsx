@@ -1,9 +1,10 @@
-import { Button, Text, Container, Table, Link } from '@nextui-org/react'
+import { Button, Container, Link, Table, Text } from '@nextui-org/react'
 import { Models, Query } from 'appwrite'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useQuery, useQueryClient } from 'react-query'
+
 import { GitHubProviderModal, GitLabProviderModal } from '../components'
 import { useAppwrite } from '../hooks'
 

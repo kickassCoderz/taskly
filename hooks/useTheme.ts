@@ -1,5 +1,5 @@
-import { useTheme as useNextTheme } from 'next-themes'
 import { useTheme as useNextUITheme } from '@nextui-org/react'
+import { useTheme as useNextTheme } from 'next-themes'
 
 const useTheme = () => {
     const { setTheme } = useNextTheme()
