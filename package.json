@@ -10,14 +10,17 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "@nextui-org/react": "^1.0.8-beta.5",
+        "@hookform/resolvers": "^2.8.8",
+        "@nextui-org/react": "^1.0.0-beta.6",
         "appwrite": "^7.0.0",
         "next": "12.1.5",
         "next-themes": "^0.1.1",
         "node-appwrite": "^5.1.0",
         "react": "18.0.0",
         "react-dom": "18.0.0",
-        "react-query": "^3.36.0"
+        "react-hook-form": "^7.30.0",
+        "react-query": "^3.36.0",
+        "zod": "^3.14.4"
     },
     "devDependencies": {
         "@commitlint/cli": "^16.2.3",
