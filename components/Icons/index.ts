@@ -1,0 +1,5 @@
+export * from './EmailIcon'
+export * from './GithubIcon'
+export * from './GitlabIcon'
+export * from './LockIcon'
+export * from './UserIcon'

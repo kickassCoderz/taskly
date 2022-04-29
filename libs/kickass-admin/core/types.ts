@@ -138,6 +138,7 @@ export interface IAuthService {
     checkAuth: (params?: any) => Promise<boolean>
     getUserPermissions: () => Promise<any>
     getUserData: () => Promise<any>
+    register: (params: any) => Promise<any>
     [key: string]: any
 }
 
