@@ -3,9 +3,14 @@ export enum ESortOrder {
     Desc = 'desc'
 }
 
+export type TFilterValueSingle = string | number | boolean
+
+export type TFilterValueList = string[] | number[] | boolean[]
+
 export type TFilter = {
+    operator?: string
     field: string
-    value: string | number
+    value: TFilterValueSingle | TFilterValueList //string | number
 }
 
 export type TSort = {
@@ -36,7 +41,7 @@ export type TGetManyParams = {
 
 export type TGetListParams = {
     pagination?: TPagination
-    sort?: TSort
+    sort?: TSort[]
     filter?: TFilter[]
 }
 
@@ -55,7 +60,7 @@ export type TUpdateOneParams = {
 
 export type TUpdateManyParams = {
     ids: string[] | number[]
-    payload: Record<string, unknown>[]
+    payload: Record<string, unknown>
 }
 
 export type TDeleteOneParams = {

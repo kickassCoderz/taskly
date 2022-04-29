@@ -7,7 +7,7 @@ import useDataService from './useDataService'
 
 type TGetListVariables = {
     resource: string
-    params: TGetListParams
+    params?: TGetListParams
 }
 
 const useGetList = <TResponseData extends TBaseResponse[], TResponseError>(
