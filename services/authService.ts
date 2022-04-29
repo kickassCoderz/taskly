@@ -3,26 +3,43 @@ import { ELoginType, TLoginParams, TRegisterWithEmailAndPassParams } from 'types
 
 import { appwriteService } from './appwriteService'
 
+//@TODO: handle account verification, and verification confirmation
+
 const authService: IAuthService = {
     async login(params: TLoginParams) {
-        if (params.loginType === ELoginType.EmailAndPass) {
-            await appwriteService.account.createSession(params.email, params.password)
-        } else {
-            appwriteService.account.createOAuth2Session(params.provider, params.successRedirect, params.errorRedirect)
+        try {
+            if (params.loginType === ELoginType.EmailAndPass) {
+                await appwriteService.account.createSession(params.email, params.password)
+            } else {
+                appwriteService.account.createOAuth2Session(
+                    params.provider,
+                    params.successRedirect,
+                    params.errorRedirect
+                )
+            }
+        } catch (error) {
+            console.log("[authService]: Error in 'login'", error)
+
+            throw error
         }
     },
     async logout() {
-        await appwriteService.account.deleteSessions()
+        try {
+            await appwriteService.account.deleteSessions()
+        } catch (error) {
+            console.log("[authService]: Error in 'logout'", error)
+
+            throw error
+        }
     },
 
     async register(params: TRegisterWithEmailAndPassParams) {
-        //@TODO: untangle this shit
         try {
-            //
             await appwriteService.account.create('unique()', params.email, params.password, params.fullName)
-
-            await appwriteService.account.createVerification(params.emailVerificationRedirect)
+            await appwriteService.account.createSession(params.email, params.password)
         } catch (error) {
+            console.log("[authService]: Error in 'register'", error)
+
             throw error
         }
     },
@@ -32,11 +49,20 @@ const authService: IAuthService = {
 
             return !!activeUserSessionsData?.sessions?.length
         } catch (error) {
-            return false
+            console.log("[authService]: Error in 'checkAuth'", error)
+
+            throw error
         }
     },
     async getUserData() {
-        return appwriteService.account.get()
+        try {
+            const userData = await appwriteService.account.get()
+
+            return userData
+        } catch (error) {
+            console.log("[authService]: Error in 'getUserData'", error)
+            throw error
+        }
     },
     async getUserPermissions() {
         throw new Error('Unimplemented')
