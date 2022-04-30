@@ -1,14 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLogin } from '@kickass-admin'
-import { Button, Card, Container, Input, Link as NextUILink, Row, Spacer, Text } from '@nextui-org/react'
-import { EmailIcon, GithubIcon, GitlabIcon, LockIcon } from 'components'
+import { Button, Card, Container, Input, Link as NextUILink, Spacer, Text } from '@nextui-org/react'
+import { EmailIcon, GithubIcon, GitlabIcon, LandingLayout, LockIcon } from 'components'
 import Link from 'next/link'
-import { useCallback } from 'react'
+import { useRouter } from 'next/router'
+import React, { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { EAuthProvider, ELoginType, TLoginParams, TLoginWithEmailAndPassParamsBase } from 'types'
 import { loginValidationSchema } from 'validationSchemas'
 
 const SignInPage = () => {
+    const router = useRouter()
+
     const {
         setError,
         register,
@@ -26,6 +29,10 @@ const SignInPage = () => {
             loginMutation.mutate(
                 { ...formData, loginType: ELoginType.EmailAndPass },
                 {
+                    onSuccess() {
+                        const redirectPath = (router.query?.loginRedirect as string) || '/dashboard'
+                        router.replace(redirectPath)
+                    },
                     onError() {
                         setError('email', { type: 'response', message: 'Invalid email or password!' })
                         setError('password', { type: 'response', message: 'Invalid email or password!' })
@@ -34,35 +41,51 @@ const SignInPage = () => {
             )
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [loginMutation.mutate, setError]
+        [loginMutation.mutate, setError, router.replace, router.query]
     )
 
     const handleLoginWithGithub = useCallback(() => {
         const redirectUrl = new URL(window.location.toString()).toString()
 
-        loginMutation.mutate({
-            loginType: ELoginType.Provider,
-            successRedirect: redirectUrl,
-            errorRedirect: redirectUrl,
-            provider: EAuthProvider.Github
-        })
+        loginMutation.mutate(
+            {
+                loginType: ELoginType.Provider,
+                successRedirect: redirectUrl,
+                errorRedirect: redirectUrl,
+                provider: EAuthProvider.Github
+            },
+            {
+                onSuccess() {
+                    const redirectPath = (router.query?.loginRedirect as string) || '/dashboard'
+                    router.replace(redirectPath)
+                }
+            }
+        )
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loginMutation.mutate])
+    }, [loginMutation.mutate, router.replace, router.query])
 
     const handleLoginWithGitlab = useCallback(() => {
         const redirectUrl = new URL(window.location.toString()).toString()
 
-        loginMutation.mutate({
-            loginType: ELoginType.Provider,
-            successRedirect: redirectUrl,
-            errorRedirect: redirectUrl,
-            provider: EAuthProvider.Gitlab
-        })
+        loginMutation.mutate(
+            {
+                loginType: ELoginType.Provider,
+                successRedirect: redirectUrl,
+                errorRedirect: redirectUrl,
+                provider: EAuthProvider.Gitlab
+            },
+            {
+                onSuccess() {
+                    const redirectPath = (router.query?.loginRedirect as string) || '/dashboard'
+                    router.replace(redirectPath)
+                }
+            }
+        )
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loginMutation.mutate])
+    }, [loginMutation.mutate, router.replace, router.query])
 
     return (
-        <Container fluid display="flex" alignItems="center" justify="center" css={{ flex: '1' }}>
+        <Container as="main" fluid display="flex" alignItems="center" justify="center" css={{ flex: '1' }}>
             <Card as="form" onSubmit={handleSubmit(handleLoginWithEmailAndPass)} shadow css={{ mw: '480px' }}>
                 <Card.Header css={{ justifyContent: 'center' }}>
                     <Text h2>Welcome back!</Text>
@@ -130,6 +153,10 @@ const SignInPage = () => {
             </Card>
         </Container>
     )
+}
+
+SignInPage.getLayout = (page: React.ReactElement) => {
+    return <LandingLayout>{page}</LandingLayout>
 }
 
 export default SignInPage

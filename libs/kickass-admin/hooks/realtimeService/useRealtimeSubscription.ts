@@ -17,22 +17,24 @@ const useRealtimeSubscription = <TSubscribeParams extends TSubscribeParamsBase>(
     const realtimeService = useRealtimeService()
 
     useEffect(() => {
-        let unsubscriber: TUnsubscriber
+        let unsubscriber: TUnsubscriber | undefined
 
         if (enabled) {
             unsubscriber = realtimeService.subscribe({
-                channel: channel,
-                eventTypes: eventTypes,
-                onChange: onChange,
-                params: params
+                channel,
+                eventTypes,
+                params,
+                onChange
             })
         }
 
         return () => {
-            realtimeService.unsubscribe({ channel, unsubscriber, eventTypes, params })
+            if (unsubscriber) {
+                realtimeService.unsubscribe({ channel, unsubscriber, eventTypes, params })
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [enabled, onChange, params, eventTypes, channel])
+    }, [enabled])
 }
 
 export default useRealtimeSubscription

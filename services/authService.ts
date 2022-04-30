@@ -51,7 +51,7 @@ const authService: IAuthService = {
         } catch (error) {
             console.log("[authService]: Error in 'checkAuth'", error)
 
-            throw error
+            return false
         }
     },
     async getUserData() {

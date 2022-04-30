@@ -13,6 +13,7 @@
         "@hookform/resolvers": "^2.8.8",
         "@nextui-org/react": "^1.0.0-beta.6",
         "appwrite": "^7.0.0",
+        "dayjs": "^1.11.1",
         "next": "12.1.5",
         "next-themes": "^0.1.1",
         "node-appwrite": "^5.1.0",

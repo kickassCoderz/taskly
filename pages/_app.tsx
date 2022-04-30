@@ -1,17 +1,27 @@
 import { AuthServiceProvider, DataServiceProvider, RealtimeServiceProvider } from '@kickass-admin'
 import { NextUIProvider } from '@nextui-org/react'
-import { BaseLayout } from 'components'
+import { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import { ThemeProvider as NextThemeProvider } from 'next-themes'
 import { useState } from 'react'
 import { Hydrate, QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
-import { authService, dataService } from 'services'
+import { authService, dataService, realtimeService } from 'services'
 
 import { themeProviderValues } from '../theme'
 
-const App = ({ Component, pageProps }: AppProps) => {
+type TNextPageWithLayout = NextPage & {
+    getLayout?: (page: React.ReactElement) => JSX.Element
+}
+
+type TAppPropsWithLayout = AppProps & {
+    Component: TNextPageWithLayout
+}
+
+const App = ({ Component, pageProps }: TAppPropsWithLayout) => {
     const [queryClient] = useState(() => new QueryClient())
+
+    const getLayout = Component.getLayout ?? (page => page)
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -19,13 +29,9 @@ const App = ({ Component, pageProps }: AppProps) => {
             <Hydrate state={pageProps?.dehydratedState}>
                 <DataServiceProvider dataService={dataService}>
                     <AuthServiceProvider authService={authService}>
-                        <RealtimeServiceProvider>
+                        <RealtimeServiceProvider realtimeService={realtimeService}>
                             <NextThemeProvider defaultTheme="system" attribute="class" value={themeProviderValues}>
-                                <NextUIProvider>
-                                    <BaseLayout>
-                                        <Component {...pageProps} />
-                                    </BaseLayout>
-                                </NextUIProvider>
+                                <NextUIProvider>{getLayout(<Component {...pageProps} />)}</NextUIProvider>
                             </NextThemeProvider>
                         </RealtimeServiceProvider>
                     </AuthServiceProvider>
