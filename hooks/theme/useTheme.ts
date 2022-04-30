@@ -8,4 +8,4 @@ const useTheme = () => {
     return { type, isDark, setTheme }
 }
 
-export default useTheme
+export { useTheme }

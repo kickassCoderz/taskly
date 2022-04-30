@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useLogin, useRegister } from '@kickass-admin'
 import { Button, Card, Container, Input, Link as NextUILink, Spacer, Text } from '@nextui-org/react'
 import { AppwriteException } from 'appwrite'
-import { EmailIcon, GithubIcon, GitlabIcon, LockIcon, UserIcon } from 'components'
+import { EmailIcon, GithubIcon, GitlabIcon, LandingLayout, LockIcon, UserIcon } from 'components'
 import Link from 'next/link'
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
@@ -74,7 +74,7 @@ const SignUpPage = () => {
     }, [loginMutation.mutate])
 
     return (
-        <Container fluid display="flex" alignItems="center" justify="center" css={{ flex: '1' }}>
+        <Container as="main" fluid display="flex" alignItems="center" justify="center" css={{ flex: '1' }}>
             <Card as="form" onSubmit={handleSubmit(handleRegisterWithEmailAndPass)} shadow css={{ mw: '480px' }}>
                 <Card.Header css={{ justifyContent: 'center' }}>
                     <Text h2>Let&apos;s be productive!</Text>
@@ -137,6 +137,10 @@ const SignUpPage = () => {
             </Card>
         </Container>
     )
+}
+
+SignUpPage.getLayout = (page: React.ReactElement) => {
+    return <LandingLayout>{page}</LandingLayout>
 }
 
 export default SignUpPage
