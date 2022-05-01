@@ -17,6 +17,7 @@ const AppSidebar = ({ children }: TAppSidebarProps) => {
             gap={0}
             display="flex"
             css={{
+                backgroundColor: '$backgroundContrast',
                 borderRight: '1px solid $border',
                 maxWidth: '20rem',
                 flex: '1',
