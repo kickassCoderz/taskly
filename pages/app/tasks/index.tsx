@@ -2,25 +2,25 @@ import { Row, Text } from '@nextui-org/react'
 import { AppLayout, AppPageAppBar, AppPageContainer } from 'components'
 import Link from 'next/link'
 
-const DashboardPage = () => {
+const AppTasksPage = () => {
     return (
         <>
             <AppPageAppBar>
                 <Row>
                     <Link passHref href="/dashboard">
-                        <Text h4>Dashboard</Text>
+                        <Text h4>Tasks</Text>
                     </Link>
                 </Row>
             </AppPageAppBar>
             <AppPageContainer>
-                <Text>Hello from dashboard page</Text>
+                <Text>Hello from tasks page</Text>
             </AppPageContainer>
         </>
     )
 }
 
-DashboardPage.getLayout = (page: React.ReactElement) => {
+AppTasksPage.getLayout = (page: React.ReactElement) => {
     return <AppLayout>{page}</AppLayout>
 }
 
-export default DashboardPage
+export default AppTasksPage

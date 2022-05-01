@@ -4,6 +4,7 @@ import { Button, Card, Container, Input, Link as NextUILink, Spacer, Text } from
 import { AppwriteException } from 'appwrite'
 import { EmailIcon, GithubIcon, GitlabIcon, LandingLayout, LockIcon, UserIcon } from 'components'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -16,6 +17,7 @@ import {
 import { registerValidationSchema } from 'validationSchemas'
 
 const SignUpPage = () => {
+    const router = useRouter()
     const {
         setError,
         register,
@@ -37,6 +39,9 @@ const SignUpPage = () => {
             registerMutation.mutate(
                 { ...formData, emailVerificationRedirect: redirectUrl },
                 {
+                    onSuccess() {
+                        router.replace('/app')
+                    },
                     onError(error) {
                         const appWriteError = error as AppwriteException
 
@@ -46,7 +51,7 @@ const SignUpPage = () => {
             )
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [registerMutation.mutate]
+        [registerMutation.mutate, router.replace]
     )
 
     const handleLoginWithGithub = useCallback(() => {
