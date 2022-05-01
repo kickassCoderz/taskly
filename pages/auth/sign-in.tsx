@@ -30,7 +30,7 @@ const SignInPage = () => {
                 { ...formData, loginType: ELoginType.EmailAndPass },
                 {
                     onSuccess() {
-                        const redirectPath = (router.query?.loginRedirect as string) || '/dashboard'
+                        const redirectPath = (router.query?.loginRedirect as string) || '/app'
                         router.replace(redirectPath)
                     },
                     onError() {
@@ -47,40 +47,24 @@ const SignInPage = () => {
     const handleLoginWithGithub = useCallback(() => {
         const redirectUrl = new URL(window.location.toString()).toString()
 
-        loginMutation.mutate(
-            {
-                loginType: ELoginType.Provider,
-                successRedirect: redirectUrl,
-                errorRedirect: redirectUrl,
-                provider: EAuthProvider.Github
-            },
-            {
-                onSuccess() {
-                    const redirectPath = (router.query?.loginRedirect as string) || '/dashboard'
-                    router.replace(redirectPath)
-                }
-            }
-        )
+        loginMutation.mutate({
+            loginType: ELoginType.Provider,
+            successRedirect: redirectUrl,
+            errorRedirect: redirectUrl,
+            provider: EAuthProvider.Github
+        })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loginMutation.mutate, router.replace, router.query])
 
     const handleLoginWithGitlab = useCallback(() => {
         const redirectUrl = new URL(window.location.toString()).toString()
 
-        loginMutation.mutate(
-            {
-                loginType: ELoginType.Provider,
-                successRedirect: redirectUrl,
-                errorRedirect: redirectUrl,
-                provider: EAuthProvider.Gitlab
-            },
-            {
-                onSuccess() {
-                    const redirectPath = (router.query?.loginRedirect as string) || '/dashboard'
-                    router.replace(redirectPath)
-                }
-            }
-        )
+        loginMutation.mutate({
+            loginType: ELoginType.Provider,
+            successRedirect: redirectUrl,
+            errorRedirect: redirectUrl,
+            provider: EAuthProvider.Gitlab
+        })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loginMutation.mutate, router.replace, router.query])
 
