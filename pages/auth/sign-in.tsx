@@ -45,28 +45,32 @@ const SignInPage = () => {
     )
 
     const handleLoginWithGithub = useCallback(() => {
-        const redirectUrl = new URL(window.location.toString()).toString()
+        const loginRedirectPath = router.query?.loginRedirect || '/app'
+        const redirectUrl = new URL(`${window.location.origin}${loginRedirectPath}`).toString()
+        const errorUrl = new URL(window.location.toString()).toString()
 
         loginMutation.mutate({
             loginType: ELoginType.Provider,
             successRedirect: redirectUrl,
-            errorRedirect: redirectUrl,
+            errorRedirect: errorUrl,
             provider: EAuthProvider.Github
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loginMutation.mutate, router.replace, router.query])
+    }, [loginMutation.mutate, router.query])
 
     const handleLoginWithGitlab = useCallback(() => {
-        const redirectUrl = new URL(window.location.toString()).toString()
+        const loginRedirectPath = router.query?.loginRedirect || '/app'
+        const redirectUrl = new URL(`${window.location.origin}${loginRedirectPath}`).toString()
+        const errorUrl = new URL(window.location.toString()).toString()
 
         loginMutation.mutate({
             loginType: ELoginType.Provider,
             successRedirect: redirectUrl,
-            errorRedirect: redirectUrl,
+            errorRedirect: errorUrl,
             provider: EAuthProvider.Gitlab
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loginMutation.mutate, router.replace, router.query])
+    }, [loginMutation.mutate, router.query])
 
     return (
         <Container as="main" fluid display="flex" alignItems="center" justify="center" css={{ flex: '1' }}>
@@ -119,11 +123,11 @@ const SignInPage = () => {
                     <Spacer y={0.6} />
                     <Text css={{ textAlign: 'center' }}>or</Text>
                     <Spacer y={0.6} />
-                    <Button ghost iconRight={<GithubIcon />} onClick={handleLoginWithGithub}>
+                    <Button type="button" ghost iconRight={<GithubIcon />} onClick={handleLoginWithGithub}>
                         Sign in with Github
                     </Button>
                     <Spacer y={1.2} />
-                    <Button ghost iconRight={<GitlabIcon />} onClick={handleLoginWithGitlab}>
+                    <Button type="button" ghost iconRight={<GitlabIcon />} onClick={handleLoginWithGitlab}>
                         Sign in with Gitlab
                     </Button>
                 </Card.Body>

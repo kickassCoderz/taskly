@@ -55,24 +55,26 @@ const SignUpPage = () => {
     )
 
     const handleLoginWithGithub = useCallback(() => {
-        const redirectUrl = new URL(window.location.toString()).toString()
+        const redirectUrl = new URL(`${window.location.origin}/app`).toString()
+        const errorUrl = new URL(window.location.toString()).toString()
 
         loginMutation.mutate({
             loginType: ELoginType.Provider,
             successRedirect: redirectUrl,
-            errorRedirect: redirectUrl,
+            errorRedirect: errorUrl,
             provider: EAuthProvider.Github
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loginMutation.mutate])
 
     const handleLoginWithGitlab = useCallback(() => {
-        const redirectUrl = new URL(window.location.toString()).toString()
+        const redirectUrl = new URL(`${window.location.origin}/app`).toString()
+        const errorUrl = new URL(window.location.toString()).toString()
 
         loginMutation.mutate({
             loginType: ELoginType.Provider,
             successRedirect: redirectUrl,
-            errorRedirect: redirectUrl,
+            errorRedirect: errorUrl,
             provider: EAuthProvider.Gitlab
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -124,11 +126,11 @@ const SignUpPage = () => {
                     <Spacer y={0.6} />
                     <Text css={{ textAlign: 'center' }}>or</Text>
                     <Spacer y={0.6} />
-                    <Button ghost iconRight={<GithubIcon />} onClick={handleLoginWithGithub}>
+                    <Button type="button" ghost iconRight={<GithubIcon />} onClick={handleLoginWithGithub}>
                         Sign up with Github
                     </Button>
                     <Spacer y={1.2} />
-                    <Button ghost iconRight={<GitlabIcon />} onClick={handleLoginWithGitlab}>
+                    <Button type="button" ghost iconRight={<GitlabIcon />} onClick={handleLoginWithGitlab}>
                         Sign up with Gitlab
                     </Button>
                 </Card.Body>
