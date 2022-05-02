@@ -1,3 +1,6 @@
+import { IAuthService } from '@kickass-admin'
+import { Models } from 'appwrite'
+
 export enum ELoginType {
     Provider = 'provider',
     EmailAndPass = 'emailAndPass'
@@ -34,4 +37,8 @@ export type TRegisterWithEmailAndPassParamsBase = {
 
 export type TRegisterWithEmailAndPassParams = TRegisterWithEmailAndPassParamsBase & {
     emailVerificationRedirect: string
+}
+
+export interface ITasklyAuthService extends IAuthService {
+    getSessions: () => Promise<Models.Session[]>
 }

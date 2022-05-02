@@ -1,11 +1,12 @@
 import { IAuthService } from '@kickass-admin'
-import { ELoginType, TLoginParams, TRegisterWithEmailAndPassParams } from 'types'
+import { Models } from 'appwrite'
+import { ELoginType, ITasklyAuthService, TLoginParams, TRegisterWithEmailAndPassParams } from 'types'
 
 import { appwriteService } from './appwriteService'
 
 //@TODO: handle account verification, and verification confirmation
 
-const authService: IAuthService = {
+const authService: ITasklyAuthService = {
     async login(params: TLoginParams) {
         try {
             if (params.loginType === ELoginType.EmailAndPass) {
@@ -66,6 +67,39 @@ const authService: IAuthService = {
     },
     async getUserPermissions() {
         throw new Error('Unimplemented')
+    },
+    async getSessions(): Promise<Models.Session[]> {
+        try {
+            const activeUserSessionsData = await appwriteService.account.getSessions()
+
+            let { sessions } = activeUserSessionsData
+
+            if (!Array.isArray(sessions)) {
+                sessions = Object.values(sessions)
+            }
+
+            return await Promise.all(
+                Object.values(sessions).map(async item => {
+                    if (item.providerRefreshToken) {
+                        const expiryTimestamp = item.providerAccessTokenExpiry * 1000
+
+                        if (Date.now() > expiryTimestamp) {
+                            try {
+                                return await appwriteService.account.updateSession(item.$id)
+                            } catch (error) {
+                                console.error(error)
+                            }
+                        }
+                    }
+
+                    return item
+                })
+            )
+        } catch (error) {
+            console.log("[authService]: Error in 'getSessions'", error)
+
+            return []
+        }
     }
 }
 
