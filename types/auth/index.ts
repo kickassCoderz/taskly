@@ -25,6 +25,7 @@ export type TLoginOAuthParams = {
     provider: EAuthProvider
     successRedirect: string
     errorRedirect: string
+    scopes: string[]
 }
 
 export type TLoginParams = TLoginWithEmailAndPassParams | TLoginOAuthParams

@@ -15,7 +15,8 @@ const authService: ITasklyAuthService = {
                 appwriteService.account.createOAuth2Session(
                     params.provider,
                     params.successRedirect,
-                    params.errorRedirect
+                    params.errorRedirect,
+                    params.scopes
                 )
             }
         } catch (error) {
