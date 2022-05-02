@@ -96,7 +96,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             const webhookUrl = `${process.env.NEXT_PUBLIC_TASKLY_GITLAB_WEBHOOK_ENDPOINT}/${session.userId}`
             const webhookSecret = (Math.random() + 1).toString(36).substring(2) // TODO maybe some other secret generation method
 
-            const result = await fetch(repositoryUrl, {
+            const response = await fetch(repositoryUrl, {
                 method: 'POST',
                 headers: {
                     authorization: `Bearer ${session.providerAccessToken}`,
@@ -108,7 +108,13 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                     issues_events: true,
                     push_events: false
                 })
-            }).then(res => res.json())
+            })
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error ${response.status}`)
+            }
+
+            const result = await response.json()
 
             const webhook = await appwrite.database.createDocument('webhooks', 'unique()', {
                 provider: 'gitlab',

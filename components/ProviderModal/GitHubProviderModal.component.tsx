@@ -90,7 +90,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             const webhookUrl = `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session.userId}`
             const webhookSecret = (Math.random() + 1).toString(36).substring(2) // TODO maybe some other secret generation method
 
-            const result = await fetch(repositoryUrl, {
+            const response = await fetch(repositoryUrl, {
                 method: 'POST',
                 headers: { authorization: `token ${session.providerAccessToken}` },
                 body: JSON.stringify({
@@ -102,7 +102,13 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                     events: ['issues'],
                     active: true
                 })
-            }).then(res => res.json())
+            })
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error ${response.status}`)
+            }
+
+            const result = await response.json()
 
             const webhook = await appwrite.database.createDocument('webhooks', 'unique()', {
                 provider: 'github',
