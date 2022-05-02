@@ -1,5 +1,5 @@
 import { createResourceBaseQueryKey, EResourceBaseQueryKeyType, useGetList, useLogin } from '@kickass-admin'
-import { Button, Container, Grid, Link as NextUILink, Row, Table, Text } from '@nextui-org/react'
+import { Grid, Link as NextUILink, Row, Table, Text } from '@nextui-org/react'
 import {
     AppLayout,
     AppPageAppBar,
@@ -9,13 +9,14 @@ import {
     GitlabIcon,
     GitLabProviderModal
 } from 'components'
+import { ProviderButton } from 'components/ProviderButton'
 import { useAppwrite, useSessions } from 'hooks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import { useQueryClient } from 'react-query'
-import { EAuthProvider, EFilterOperators, ELoginType, TLoginParams, TTask, TWebhook } from 'types'
+import { EAuthProvider, TLoginParams, TTask } from 'types'
 
 const AppTasksPage = () => {
     const appwrite = useAppwrite()
@@ -41,63 +42,6 @@ const AppTasksPage = () => {
             enabled: !!session
         }
     )
-
-    const { data: githubWebhooks } = useGetList<TWebhook[], Error>(
-        {
-            resource: 'webhooks',
-            params: {
-                pagination: {
-                    page: 1,
-                    perPage: 1
-                },
-                filter: [
-                    {
-                        operator: EFilterOperators.Eq,
-                        field: 'provider',
-                        value: 'github'
-                    },
-                    {
-                        operator: EFilterOperators.Eq,
-                        field: 'url',
-                        value: `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session?.userId}`
-                    }
-                ]
-            }
-        },
-        {
-            enabled: !!session
-        }
-    )
-
-    const { data: gitlabWebhooks } = useGetList<TWebhook[], Error>(
-        {
-            resource: 'webhooks',
-            params: {
-                pagination: {
-                    page: 1,
-                    perPage: 1
-                },
-                filter: [
-                    {
-                        operator: EFilterOperators.Eq,
-                        field: 'provider',
-                        value: 'gitlab'
-                    },
-                    {
-                        operator: EFilterOperators.Eq,
-                        field: 'url',
-                        value: `${process.env.NEXT_PUBLIC_TASKLY_GITLAB_WEBHOOK_ENDPOINT}/${session?.userId}`
-                    }
-                ]
-            }
-        },
-        {
-            enabled: !!session
-        }
-    )
-
-    const isGitHubConnected = !!githubWebhooks?.length
-    const isGitLabConnected = !!gitlabWebhooks?.length
 
     useEffect(() => {
         if (!sessions?.length) {
@@ -169,59 +113,27 @@ const AppTasksPage = () => {
             <AppPageContainer>
                 <Grid xs={12}>
                     <Row css={{ padding: '12px 12px 0 12px' }}>
-                        {(!session || typeof githubWebhooks !== 'undefined') && (
-                            <Button
-                                iconRight={<GithubIcon />}
-                                color="primary"
-                                ghost
-                                onClick={() => {
-                                    if (!sessions?.find(item => item.provider === 'github')) {
-                                        const redirectUrl = new URL(window.location.toString())
-                                        redirectUrl.searchParams.append('manage', 'github')
-
-                                        loginMutation.mutate({
-                                            loginType: ELoginType.Provider,
-                                            successRedirect: redirectUrl.toString(),
-                                            errorRedirect: redirectUrl.toString(),
-                                            provider: EAuthProvider.Github,
-                                            scopes: ['user:email', 'repo']
-                                        })
-                                    } else {
-                                        setGitHubProviderModalOpen(true)
-                                    }
-                                }}
-                            >
-                                {isGitHubConnected ? 'Manage' : 'Connect'} GitHub
-                            </Button>
-                        )}
-                        {(!session || typeof gitlabWebhooks !== 'undefined') && (
-                            <Button
-                                css={{
-                                    marginLeft: 20
-                                }}
-                                iconRight={<GitlabIcon />}
-                                color="primary"
-                                ghost
-                                onClick={() => {
-                                    if (!sessions?.find(item => item.provider === 'gitlab')) {
-                                        const redirectUrl = new URL(window.location.toString())
-                                        redirectUrl.searchParams.append('manage', 'gitlab')
-
-                                        loginMutation.mutate({
-                                            loginType: ELoginType.Provider,
-                                            successRedirect: redirectUrl.toString(),
-                                            errorRedirect: redirectUrl.toString(),
-                                            provider: EAuthProvider.Gitlab,
-                                            scopes: ['read_user', 'api']
-                                        })
-                                    } else {
-                                        setGitLabProviderModalOpen(true)
-                                    }
-                                }}
-                            >
-                                {isGitLabConnected ? 'Manage' : 'Connect'} GitLab
-                            </Button>
-                        )}
+                        <ProviderButton
+                            iconComponent={GithubIcon}
+                            provider={EAuthProvider.Github}
+                            label="GitHub"
+                            scopes={['user:email', 'repo']}
+                            onClick={() => {
+                                setGitHubProviderModalOpen(true)
+                            }}
+                        />
+                        <ProviderButton
+                            css={{
+                                marginLeft: 20
+                            }}
+                            iconComponent={GitlabIcon}
+                            provider={EAuthProvider.Gitlab}
+                            label="GitLab"
+                            scopes={['read_user', 'api']}
+                            onClick={() => {
+                                setGitLabProviderModalOpen(true)
+                            }}
+                        />
                     </Row>
                     <Table
                         aria-label="My Tasks"
