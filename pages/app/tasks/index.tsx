@@ -1,4 +1,4 @@
-import { useGetList, useLogin } from '@kickass-admin'
+import { createResourceBaseQueryKey, EResourceBaseQueryKeyType, useGetList, useLogin } from '@kickass-admin'
 import { Button, Container, Grid, Link as NextUILink, Row, Table, Text } from '@nextui-org/react'
 import {
     AppLayout,
@@ -9,14 +9,17 @@ import {
     GitlabIcon,
     GitLabProviderModal
 } from 'components'
-import { useSessions } from 'hooks'
+import { useAppwrite, useSessions } from 'hooks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
+import { useQueryClient } from 'react-query'
 import { EAuthProvider, EFilterOperators, ELoginType, TLoginParams, TTask, TWebhook } from 'types'
 
 const AppTasksPage = () => {
+    const appwrite = useAppwrite()
+    const queryClient = useQueryClient()
     const sessions = useSessions()
     const session = sessions?.[0]
     const router = useRouter()
@@ -96,7 +99,26 @@ const AppTasksPage = () => {
     const isGitHubConnected = !!githubWebhooks?.length
     const isGitLabConnected = !!gitlabWebhooks?.length
 
-    // TODO connect realtime/subscription
+    useEffect(() => {
+        if (!sessions?.length) {
+            return
+        }
+
+        // just quick realtime sync through invalidation
+        // mostly used for import if user does not focus from tasks screen
+        const unsubscribe = appwrite.subscribe('collections.tasks.documents', () => {
+            const queryKeysToInvalidate = [
+                createResourceBaseQueryKey(EResourceBaseQueryKeyType.List, 'tasks'),
+                createResourceBaseQueryKey(EResourceBaseQueryKeyType.One, 'tasks')
+            ]
+
+            queryKeysToInvalidate.forEach(queryKey => queryClient.invalidateQueries(queryKey))
+        })
+
+        return () => {
+            unsubscribe()
+        }
+    }, [appwrite, queryClient, sessions])
 
     useEffect(() => {
         const manageParam = router.query.manage
