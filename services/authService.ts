@@ -47,7 +47,7 @@ const authService: IAuthService = {
         try {
             const activeUserSessionsData = await appwriteService.account.getSessions()
 
-            return !!activeUserSessionsData?.sessions?.length
+            return !!activeUserSessionsData?.total
         } catch (error) {
             console.log("[authService]: Error in 'checkAuth'", error)
 

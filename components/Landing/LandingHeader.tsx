@@ -1,4 +1,5 @@
-import { Button, Container, Row, Spacer, Switch, SwitchEvent, Text } from '@nextui-org/react'
+import { useCheckAuth, useLogout } from '@kickass-admin'
+import { Button, Container, Loading, Row, Spacer, Switch, SwitchEvent, Text } from '@nextui-org/react'
 import { MoonIcon, SunIcon } from 'components/Icons'
 import { useTheme } from 'hooks'
 import Link from 'next/link'
@@ -7,6 +8,8 @@ import { useCallback, useEffect, useState } from 'react'
 const LandingHeader = () => {
     const [isDetached, setIsDetached] = useState(false)
     const { isDark, setTheme } = useTheme()
+    const { isAuthenticated } = useCheckAuth()
+    const logoutMutation = useLogout()
 
     useEffect(() => {
         const isBrowser = typeof window !== 'undefined'
@@ -33,6 +36,11 @@ const LandingHeader = () => {
         },
         [setTheme]
     )
+
+    const handleLogout = useCallback(() => {
+        logoutMutation.mutate()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [logoutMutation.mutate])
 
     return (
         <Container
@@ -65,17 +73,41 @@ const LandingHeader = () => {
                             iconOff={<SunIcon />}
                         />
                         <Spacer x={1} />
-                        <Link passHref href="/auth/sign-in">
-                            <Button as="a" shadow auto ghost>
-                                Sign In
-                            </Button>
-                        </Link>
-                        <Spacer x={1} />
-                        <Link passHref href="/auth/sign-up">
-                            <Button shadow auto>
-                                Sign Up
-                            </Button>
-                        </Link>
+                        {isAuthenticated ? (
+                            <>
+                                <Button
+                                    iconRight={logoutMutation.isLoading && <Loading color="currentColor" size="xs" />}
+                                    disabled={logoutMutation.isLoading}
+                                    shadow
+                                    auto
+                                    ghost
+                                    onClick={handleLogout}
+                                >
+                                    Sign Out
+                                </Button>
+
+                                <Spacer x={1} />
+                                <Link passHref href="/app">
+                                    <Button as="a" shadow auto>
+                                        Play with Taskly
+                                    </Button>
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                <Link passHref href="/auth/sign-in">
+                                    <Button as="a" shadow auto ghost>
+                                        Sign In
+                                    </Button>
+                                </Link>
+                                <Spacer x={1} />
+                                <Link passHref href="/auth/sign-up">
+                                    <Button as="a" shadow auto>
+                                        Sign Up
+                                    </Button>
+                                </Link>
+                            </>
+                        )}
                     </Row>
                 </Row>
             </Container>
