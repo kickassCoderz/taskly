@@ -1,6 +1,13 @@
 import { Container, Row, Text, Tooltip } from '@nextui-org/react'
-import { AppLayout, AppPageAppBar, AppPageContainer, GithubIcon, GitlabIcon, TrelloIcon } from 'components'
-import { ProviderButton } from 'components/ProviderButton'
+import {
+    AppLayout,
+    AppPageAppBar,
+    AppPageContainer,
+    GithubIcon,
+    GitlabIcon,
+    ProviderButton,
+    TrelloIcon
+} from 'components'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { EAuthProvider } from 'types'

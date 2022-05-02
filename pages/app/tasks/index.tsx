@@ -8,9 +8,9 @@ import {
     GitHubProviderModal,
     GitlabIcon,
     GitLabProviderModal,
+    ProviderButton,
     TrelloIcon
 } from 'components'
-import { ProviderButton } from 'components/ProviderButton'
 import { useAppwrite, useSessions } from 'hooks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
