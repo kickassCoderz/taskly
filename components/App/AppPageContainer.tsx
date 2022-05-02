@@ -6,7 +6,7 @@ type TAppPageContainer = {
 
 const AppPageContainer = ({ children }: TAppPageContainer) => {
     return (
-        <Container as="main" fluid gap={1} css={{ py: '$sm' }}>
+        <Container as="main" responsive={false} fluid gap={0}>
             {children}
         </Container>
     )

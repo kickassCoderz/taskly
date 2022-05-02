@@ -1,7 +1,6 @@
 import { CheckAuth } from '@kickass-admin'
 import { Container, Loading } from '@nextui-org/react'
-import { AppSidebar, AppSidebarAppBar, AppSidebarNavigation } from 'components/App'
-import { RemoveMeLogout } from 'components/RemoveMeLogout'
+import { AppSidebar } from 'components/App'
 import { useRouter } from 'next/router'
 import { AppNavigationProvider } from 'providers'
 import { useCallback } from 'react'
@@ -49,16 +48,12 @@ const AppLayout = ({ children }: TAppLayoutProps) => {
                     direction="row"
                     css={{ minHeight: '100vh', position: 'relative' }}
                 >
-                    <AppSidebar>
-                        <AppSidebarAppBar />
-                        <AppSidebarNavigation />
-                    </AppSidebar>
+                    <AppSidebar />
                     <Container fluid responsive={false} gap={0} css={{ flex: '1' }}>
                         {children}
                     </Container>
                 </Container>
             </AppNavigationProvider>
-            <RemoveMeLogout />
         </CheckAuth>
     )
 }

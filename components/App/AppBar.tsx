@@ -1,4 +1,4 @@
-import { Card, Container } from '@nextui-org/react'
+import { Container } from '@nextui-org/react'
 
 type TAppBarProps = {
     sticky?: boolean
@@ -9,13 +9,14 @@ type TAppBarProps = {
 const AppBar = ({ children, sticky = false, bottomBorder = true }: TAppBarProps) => {
     return (
         <Container
+            as="header"
+            display="flex"
             fluid
             responsive={false}
             gap={0}
             css={{
                 height: '$17',
                 backgroundColor: '$backgroundContrast',
-                padding: '$6',
                 ...(sticky && {
                     position: 'sticky',
                     top: 0,
