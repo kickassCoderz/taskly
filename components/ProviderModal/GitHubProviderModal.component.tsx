@@ -1,9 +1,9 @@
+import { createResourceBaseQueryKey, EResourceBaseQueryKeyType, useGetList } from '@kickass-admin'
 import { Button, Container, Link, Modal, Table, Text } from '@nextui-org/react'
-import { Models, Query } from 'appwrite'
 import { GithubIcon } from 'components/Icons'
-import Image from 'next/image'
 import React, { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { EFilterOperators, TWebhook } from 'types'
 
 import { useAppwrite, useSessions } from '../../hooks'
 
@@ -55,14 +55,26 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
         [repositories]
     )
 
-    const { data: webhooks, isLoading: isConnectedMapLoading } = useQuery(
-        ['webhooks', 'github', { resourceId: repositoriesToSearch }],
-        () => {
-            return appwrite.database.listDocuments<Models.Document & { resourceId: string; url: string }>('webhooks', [
-                Query.equal('resourceId', repositoriesToSearch)
-            ])
+    const { data: webhooks, isLoading: isConnectedMapLoading } = useGetList<TWebhook[], Error>(
+        {
+            resource: 'webhooks',
+            params: {
+                pagination: {
+                    page: 1,
+                    perPage: 100
+                },
+                filter: [
+                    {
+                        operator: EFilterOperators.Eq,
+                        field: 'resourceId',
+                        value: repositoriesToSearch
+                    }
+                ]
+            }
         },
-        { enabled: !!session }
+        {
+            enabled: !!session && !!isOpen
+        }
     )
 
     const isConnectedMap = useMemo<Record<string, boolean>>(() => {
@@ -72,7 +84,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
 
         const webhookUrl = `${process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT}/${session.userId}`
 
-        return webhooks?.documents.reduce((acc, item) => {
+        return webhooks?.reduce((acc, item) => {
             return {
                 ...acc,
                 [item.resourceId]: item.url === webhookUrl
@@ -127,16 +139,11 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
 
             return webhook
         },
-        onSuccess: data => {
-            const updater = (current: any) => {
-                return {
-                    total: (current?.total || 0) + 1,
-                    documents: [...(current?.documents || []), data]
-                }
-            }
+        onSuccess: () => {
+            // just invalidate all webhooks, appwrite api fast
+            const queryKeysToInvalidate = [createResourceBaseQueryKey(EResourceBaseQueryKeyType.List, 'webhooks')]
 
-            queryClient.setQueryData(['webhooks', 'github', { resourceId: repositoriesToSearch }], updater)
-            queryClient.setQueryData(['webhooks', 'github'], updater)
+            queryKeysToInvalidate.forEach(queryKey => queryClient.invalidateQueries(queryKey))
         }
     })
 

@@ -47,7 +47,7 @@ const ProviderButton: FC<
             }
         },
         {
-            enabled: !!session
+            enabled: !!session && !rest.disabled
         }
     )
 
