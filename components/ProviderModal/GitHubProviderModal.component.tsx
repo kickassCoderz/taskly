@@ -1,18 +1,20 @@
 import { Button, Container, Link, Modal, Table, Text } from '@nextui-org/react'
 import { Models, Query } from 'appwrite'
+import { GithubIcon } from 'components/Icons'
 import Image from 'next/image'
 import React, { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 
-import { useAppwrite } from '../../hooks'
+import { useAppwrite, useSessions } from '../../hooks'
 
 const paginationRegex = /<.*page=(?<last>[0-9]{1,}).*>; rel="last"/
 
 const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     const queryClient = useQueryClient()
-    const session: Models.Session | undefined = queryClient
-        .getQueryData<Models.Session[]>(['session'])
-        ?.find(item => item.provider === 'github')
+    const sessions = useSessions()
+    const session = useMemo(() => {
+        return sessions?.find(item => item.provider === 'github')
+    }, [sessions])
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [total, setTotal] = useState(0)
@@ -28,6 +30,10 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             const response = await fetch(`https://api.github.com/user/repos?page=${page}&type=owner`, {
                 headers: { authorization: `token ${session.providerAccessToken}` }
             })
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error ${response.status}`)
+            }
 
             const { last } = response.headers.get('link')?.match(paginationRegex)?.groups || {}
             const result: any[] = await response.json()
@@ -142,7 +148,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
         >
             <Modal.Header>
                 <Container display="flex" direction="row">
-                    <Image width="20" height="20" src="/github.svg" alt="Connect GitHub" />
+                    <GithubIcon />
                     <Text id="modal-title" size={18}>
                         GitHub connection
                     </Text>
@@ -158,6 +164,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
 
                         // TODO actually search
                     }}
+                    aria-labelledby="search-repositories"
                 /> */}
                 <Table
                     fixed
@@ -167,6 +174,9 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                         minWidth: '100%'
                     }}
                     sticked
+                    containerCss={{
+                        overflow: 'auto scroll'
+                    }}
                 >
                     <Table.Header>
                         <Table.Column>Repositories</Table.Column>

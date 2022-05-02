@@ -1,12 +1,20 @@
-import { useGetList } from '@kickass-admin'
+import { useGetList, useLogin } from '@kickass-admin'
 import { Button, Container, Grid, Link as NextUILink, Row, Table, Text } from '@nextui-org/react'
-import { AppLayout, AppPageAppBar, AppPageContainer, GithubIcon, GitlabIcon } from 'components'
+import {
+    AppLayout,
+    AppPageAppBar,
+    AppPageContainer,
+    GithubIcon,
+    GitHubProviderModal,
+    GitlabIcon,
+    GitLabProviderModal
+} from 'components'
 import { useSessions } from 'hooks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
-import { EFilterOperators, TTask, TWebhook } from 'types'
+import { EAuthProvider, EFilterOperators, ELoginType, TLoginParams, TTask, TWebhook } from 'types'
 
 const AppTasksPage = () => {
     const sessions = useSessions()
@@ -14,6 +22,7 @@ const AppTasksPage = () => {
     const router = useRouter()
     const [isGitHubProviderModalOpen, setGitHubProviderModalOpen] = useState(false)
     const [isGitLabProviderModalOpen, setGitLabProviderModalOpen] = useState(false)
+    const loginMutation = useLogin<TLoginParams>()
 
     const { data: tasks, isLoading } = useGetList<TTask[], Error>(
         {
@@ -148,13 +157,13 @@ const AppTasksPage = () => {
                                         const redirectUrl = new URL(window.location.toString())
                                         redirectUrl.searchParams.append('manage', 'github')
 
-                                        // TODO connect auth service
-                                        // appwrite.account.createOAuth2Session(
-                                        //     'github',
-                                        //     redirectUrl.toString(),
-                                        //     redirectUrl.toString(),
-                                        //     ['user:email', 'repo']
-                                        // )
+                                        loginMutation.mutate({
+                                            loginType: ELoginType.Provider,
+                                            successRedirect: redirectUrl.toString(),
+                                            errorRedirect: redirectUrl.toString(),
+                                            provider: EAuthProvider.Github,
+                                            scopes: ['user:email', 'repo']
+                                        })
                                     } else {
                                         setGitHubProviderModalOpen(true)
                                     }
@@ -176,13 +185,13 @@ const AppTasksPage = () => {
                                         const redirectUrl = new URL(window.location.toString())
                                         redirectUrl.searchParams.append('manage', 'gitlab')
 
-                                        // TODO connect auth service
-                                        // appwrite.account.createOAuth2Session(
-                                        //     'gitlab',
-                                        //     redirectUrl.toString(),
-                                        //     redirectUrl.toString(),
-                                        //     ['read_user', 'api']
-                                        // )
+                                        loginMutation.mutate({
+                                            loginType: ELoginType.Provider,
+                                            successRedirect: redirectUrl.toString(),
+                                            errorRedirect: redirectUrl.toString(),
+                                            provider: EAuthProvider.Gitlab,
+                                            scopes: ['read_user', 'api']
+                                        })
                                     } else {
                                         setGitLabProviderModalOpen(true)
                                     }
@@ -226,6 +235,8 @@ const AppTasksPage = () => {
                     </Table>
                 </Grid>
             </AppPageContainer>
+            <GitHubProviderModal isOpen={isGitHubProviderModalOpen} onClose={() => setGitHubProviderModalOpen(false)} />
+            <GitLabProviderModal isOpen={isGitLabProviderModalOpen} onClose={() => setGitLabProviderModalOpen(false)} />
         </>
     )
 }
