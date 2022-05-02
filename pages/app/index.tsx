@@ -1,19 +1,18 @@
+import { useGetUser } from '@kickass-admin'
 import { Row, Text } from '@nextui-org/react'
+import { Models } from 'appwrite'
 import { AppLayout, AppPageAppBar, AppPageContainer } from 'components'
-import Link from 'next/link'
 
 const AppHomePage = () => {
+    const userQuery = useGetUser<Models.User<Models.Preferences>>()
+
     return (
         <>
-            <AppPageAppBar>
-                <Row>
-                    <Link passHref href="/dashboard">
-                        <Text h4>Home</Text>
-                    </Link>
-                </Row>
-            </AppPageAppBar>
+            <AppPageAppBar title="Home" />
             <AppPageContainer>
-                <Text>Hello from App home page</Text>
+                <Row gap={1}>
+                    <Text>saf</Text>
+                </Row>
             </AppPageContainer>
         </>
     )

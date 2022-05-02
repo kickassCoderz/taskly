@@ -2,11 +2,10 @@ import { Container } from '@nextui-org/react'
 import { useAppNavigation } from 'hooks'
 import React from 'react'
 
-type TAppSidebarProps = {
-    children: React.ReactNode
-}
+import { AppSidebarAppBar } from './AppSidebarAppBar'
+import { AppSidebarNavigation } from './AppSidebarNavigation'
 
-const AppSidebar = ({ children }: TAppSidebarProps) => {
+const AppSidebar = () => {
     const { isOpen } = useAppNavigation()
 
     return (
@@ -15,20 +14,20 @@ const AppSidebar = ({ children }: TAppSidebarProps) => {
             fluid
             responsive={false}
             gap={0}
-            display="flex"
             css={{
                 backgroundColor: '$backgroundContrast',
                 borderRight: '1px solid $border',
-                maxWidth: '20rem',
+                maxWidth: '18rem',
                 flex: '1',
                 position: isOpen ? 'absolute' : 'sticky',
                 top: 0,
                 left: 0,
                 height: '100vh',
-                transform: isOpen ? 'translateX(-20rem)' : 'translateX(0)'
+                transform: isOpen ? 'translateX(-18rem)' : 'translateX(0)'
             }}
         >
-            {children}
+            <AppSidebarAppBar />
+            <AppSidebarNavigation />
         </Container>
     )
 }

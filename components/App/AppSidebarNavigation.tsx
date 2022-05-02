@@ -1,23 +1,39 @@
-import { Button, Col, Container, Divider, Link as NextUILink, Row, Spacer, Text } from '@nextui-org/react'
+import { Container, Divider, Grid, Row, Spacer, Text } from '@nextui-org/react'
+import { Badge } from 'components/Base'
+import { HomeIcon, TaskIcon } from 'components/Icons'
 import { memo } from 'react'
+
+import { SidebarNavLink } from './AppSidebarNavLink'
 
 const AppSidebarNavigation = memo(() => {
     return (
-        <Container
-            fluid
-            responsive={false}
-            gap={0}
-            css={{
-                flex: 1,
-                position: 'relative'
-            }}
-        >
-            <Container fluid responsive={false} gap={1} direction="column" css={{ py: '$sm' }}>
-                {/* <NextUILink block css={{ display: 'flex', alignItems: 'center' }}>
-                    <HomeIcon />
-                    <Spacer x={1} /> Dashboard
-                </NextUILink> */}
-            </Container>
+        <Container as="nav" fluid responsive={false} gap={0}>
+            <Spacer y={0.5} />
+            <Row gap={1} align="center" justify="space-between" fluid={false}>
+                <Text weight="bold">Workspaces</Text>
+                <Spacer x={1} />
+                <Badge>Comming soon</Badge>
+            </Row>
+
+            <Row gap={1} fluid={false}>
+                <Divider y={1} />
+            </Row>
+            <Grid.Container as="ul" gap={0}>
+                <Grid as="li" xs={12}>
+                    <SidebarNavLink icon={<HomeIcon size={18} />} label="Home" href="/app" exact />
+                </Grid>
+                <Grid as="li" xs={12}>
+                    <SidebarNavLink icon={<TaskIcon size={18} />} label="My tasks" href="/app/my-tasks" />
+                </Grid>
+            </Grid.Container>
+            <Row gap={1} fluid={false}>
+                <Divider y={1} />
+            </Row>
+            <Row gap={1} align="center">
+                <Text weight="bold">Projects</Text>
+                <Spacer x={1} />
+                <Badge>Comming soon</Badge>
+            </Row>
         </Container>
     )
 })

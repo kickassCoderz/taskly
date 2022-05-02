@@ -25,7 +25,7 @@ const App = ({ Component, pageProps }: TAppPropsWithLayout) => {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <ReactQueryDevtools />
+            <ReactQueryDevtools position="bottom-right" />
             <Hydrate state={pageProps?.dehydratedState}>
                 <DataServiceProvider dataService={dataService}>
                     <AuthServiceProvider authService={authService}>
