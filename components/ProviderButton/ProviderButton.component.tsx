@@ -6,7 +6,8 @@ import { EAuthProvider, EFilterOperators, ELoginType, TLoginParams, TWebhook } f
 
 const WEBHOOKS = {
     [EAuthProvider.Github]: process.env.NEXT_PUBLIC_TASKLY_GITHUB_WEBHOOK_ENDPOINT,
-    [EAuthProvider.Gitlab]: process.env.NEXT_PUBLIC_TASKLY_GITLAB_WEBHOOK_ENDPOINT
+    [EAuthProvider.Gitlab]: process.env.NEXT_PUBLIC_TASKLY_GITLAB_WEBHOOK_ENDPOINT,
+    [EAuthProvider.Trello]: process.env.NEXT_PUBLIC_TASKLY_TRELLO_WEBHOOK_ENDPOINT
 }
 
 const ProviderButton: FC<
@@ -16,8 +17,9 @@ const ProviderButton: FC<
         label?: string
         scopes: string[]
         onClick?: MouseEventHandler<HTMLButtonElement>
+        redirectPath?: string
     } & ButtonProps
-> = ({ iconComponent: Icon, provider, label = provider, scopes, onClick, ...rest }) => {
+> = ({ iconComponent: Icon, provider, label = provider, scopes, onClick, redirectPath, ...rest }) => {
     const sessions = useSessions()
     const session = sessions?.[0]
     const loginMutation = useLogin<TLoginParams>()
@@ -61,6 +63,10 @@ const ProviderButton: FC<
                 if (!sessions?.find(item => item.provider === provider)) {
                     const redirectUrl = new URL(window.location.toString())
                     redirectUrl.searchParams.append('manage', provider)
+
+                    if (redirectPath) {
+                        redirectUrl.pathname = redirectPath
+                    }
 
                     loginMutation.mutate({
                         loginType: ELoginType.Provider,
