@@ -1,16 +1,18 @@
 import { Button, Container, Input, Link, Modal, Table, Text } from '@nextui-org/react'
 import { Models, Query } from 'appwrite'
+import { GitlabIcon } from 'components/Icons'
 import Image from 'next/image'
 import React, { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 
-import { useAppwrite } from '../../hooks'
+import { useAppwrite, useSessions } from '../../hooks'
 
 const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     const queryClient = useQueryClient()
-    const session: Models.Session | undefined = queryClient
-        .getQueryData<Models.Session[]>(['session'])
-        ?.find(item => item.provider === 'gitlab')
+    const sessions = useSessions()
+    const session = useMemo(() => {
+        return sessions?.find(item => item.provider === 'gitlab')
+    }, [sessions])
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [total, setTotal] = useState(0)
@@ -32,6 +34,10 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                     }
                 }
             )
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error ${response.status}`)
+            }
 
             const total = response.headers.get('x-total-pages')
             const result: any[] = await response.json()
@@ -148,7 +154,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
         >
             <Modal.Header>
                 <Container display="flex" direction="row">
-                    <Image width="20" height="20" src="/gitlab.svg" alt="Connect GitLab" />
+                    <GitlabIcon />
                     <Text id="modal-title" size={18}>
                         GitLab connection
                     </Text>
@@ -162,6 +168,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                     onChange={event => {
                         setSearch(event.target.value || '')
                     }}
+                    aria-labelledby="search-repositories"
                 />
                 <Table
                     fixed
@@ -171,6 +178,9 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                         minWidth: '100%'
                     }}
                     sticked
+                    containerCss={{
+                        overflow: 'auto scroll'
+                    }}
                 >
                     <Table.Header>
                         <Table.Column>Repositories</Table.Column>

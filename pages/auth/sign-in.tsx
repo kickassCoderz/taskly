@@ -55,7 +55,8 @@ const SignInPage = () => {
             loginType: ELoginType.Provider,
             successRedirect: redirectUrl,
             errorRedirect: errorUrl,
-            provider: EAuthProvider.Github
+            provider: EAuthProvider.Github,
+            scopes: ['user:email', 'repo']
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loginMutation.mutate, router.query])
@@ -69,7 +70,8 @@ const SignInPage = () => {
             loginType: ELoginType.Provider,
             successRedirect: redirectUrl,
             errorRedirect: errorUrl,
-            provider: EAuthProvider.Gitlab
+            provider: EAuthProvider.Gitlab,
+            scopes: ['read_user', 'api']
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loginMutation.mutate, router.query])

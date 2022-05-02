@@ -7,7 +7,8 @@ export enum EResourceBaseQueryKeyType {
 export enum EAuthBaseQueryKeyType {
     User = 'user',
     UserPermissions = 'userPermissions',
-    IsAuthenticated = 'isAuthenticated'
+    IsAuthenticated = 'isAuthenticated',
+    Sessions = 'sessions' // @NOTE: maybe support custom types here
 }
 
 const createResourceBaseQueryKey = (type: EResourceBaseQueryKeyType, resource: string) => {
