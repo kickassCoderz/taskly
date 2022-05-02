@@ -8,7 +8,8 @@ export enum ELoginType {
 
 export enum EAuthProvider {
     Github = 'github',
-    Gitlab = 'gitlab'
+    Gitlab = 'gitlab',
+    Trello = 'trello' // not really working, coming soon
 }
 
 export type TLoginWithEmailAndPassParamsBase = {

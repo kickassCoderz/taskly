@@ -1,5 +1,5 @@
 import { createResourceBaseQueryKey, EResourceBaseQueryKeyType, useGetList, useLogin } from '@kickass-admin'
-import { Grid, Link as NextUILink, Row, Table, Text } from '@nextui-org/react'
+import { Grid, Link as NextUILink, Row, Table, Text, Tooltip } from '@nextui-org/react'
 import {
     AppLayout,
     AppPageAppBar,
@@ -7,7 +7,8 @@ import {
     GithubIcon,
     GitHubProviderModal,
     GitlabIcon,
-    GitLabProviderModal
+    GitLabProviderModal,
+    TrelloIcon
 } from 'components'
 import { ProviderButton } from 'components/ProviderButton'
 import { useAppwrite, useSessions } from 'hooks'
@@ -134,6 +135,26 @@ const AppTasksPage = () => {
                                 setGitLabProviderModalOpen(true)
                             }}
                         />
+                        <Tooltip
+                            css={{
+                                textTransform: 'uppercase',
+                                fontWeight: 'bold'
+                            }}
+                            color="primary"
+                            content="Coming soon"
+                            placement="bottom"
+                        >
+                            <ProviderButton
+                                css={{
+                                    marginLeft: 20
+                                }}
+                                iconComponent={TrelloIcon}
+                                provider={EAuthProvider.Trello}
+                                label="Trello"
+                                scopes={[]}
+                                disabled
+                            />
+                        </Tooltip>
                     </Row>
                     <Table
                         aria-label="My Tasks"
