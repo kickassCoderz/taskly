@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useLogin } from '@kickass-admin'
-import { Button, Card, Container, Input, Link as NextUILink, Spacer, Text } from '@nextui-org/react'
+import { Button, Card, Container, Input, Link as NextUILink, Loading, Spacer, Text } from '@nextui-org/react'
 import { EmailIcon, GithubIcon, GitlabIcon, LandingLayout, LockIcon } from 'components'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -8,6 +8,8 @@ import React, { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { EAuthProvider, ELoginType, TLoginParams, TLoginWithEmailAndPassParamsBase } from 'types'
 import { loginValidationSchema } from 'validationSchemas'
+
+//@TODO: add loading state when user is allready logged in because we want to redirect it to app and we dont want flashes
 
 const SignInPage = () => {
     const router = useRouter()
@@ -74,11 +76,11 @@ const SignInPage = () => {
 
     return (
         <Container as="main" fluid display="flex" alignItems="center" justify="center" css={{ flex: '1' }}>
-            <Card as="form" onSubmit={handleSubmit(handleLoginWithEmailAndPass)} shadow css={{ mw: '480px' }}>
+            <Card onSubmit={handleSubmit(handleLoginWithEmailAndPass)} shadow css={{ mw: '480px' }}>
                 <Card.Header css={{ justifyContent: 'center' }}>
                     <Text h2>Welcome back!</Text>
                 </Card.Header>
-                <Card.Body>
+                <Card.Body as="form">
                     <Input
                         {...register('email')}
                         type="email"
@@ -119,15 +121,37 @@ const SignInPage = () => {
                         placeholder="Enter your password"
                     />
                     <Spacer y={1.6} />
-                    <Button type="submit">Sign in</Button>
+                    <Button
+                        disabled={loginMutation.isLoading}
+                        iconRight={loginMutation.isLoading && <Loading color="currentColor" size="sm" />}
+                        type="submit"
+                    >
+                        Sign in
+                    </Button>
                     <Spacer y={0.6} />
                     <Text css={{ textAlign: 'center' }}>or</Text>
                     <Spacer y={0.6} />
-                    <Button type="button" ghost iconRight={<GithubIcon />} onClick={handleLoginWithGithub}>
+                    <Button
+                        type="button"
+                        disabled={loginMutation.isLoading}
+                        ghost
+                        iconRight={
+                            loginMutation.isLoading ? <Loading color="currentColor" size="sm" /> : <GithubIcon />
+                        }
+                        onClick={handleLoginWithGithub}
+                    >
                         Sign in with Github
                     </Button>
                     <Spacer y={1.2} />
-                    <Button type="button" ghost iconRight={<GitlabIcon />} onClick={handleLoginWithGitlab}>
+                    <Button
+                        type="button"
+                        ghost
+                        disabled={loginMutation.isLoading}
+                        iconRight={
+                            loginMutation.isLoading ? <Loading color="currentColor" size="sm" /> : <GitlabIcon />
+                        }
+                        onClick={handleLoginWithGitlab}
+                    >
                         Sign in with Gitlab
                     </Button>
                 </Card.Body>
