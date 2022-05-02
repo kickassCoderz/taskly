@@ -2,6 +2,7 @@ import { AuthServiceProvider, DataServiceProvider, RealtimeServiceProvider } fro
 import { NextUIProvider } from '@nextui-org/react'
 import { NextPage } from 'next'
 import type { AppProps } from 'next/app'
+import { DefaultSeo } from 'next-seo'
 import { ThemeProvider as NextThemeProvider } from 'next-themes'
 import { useState } from 'react'
 import { Hydrate, QueryClient, QueryClientProvider } from 'react-query'
@@ -24,20 +25,23 @@ const App = ({ Component, pageProps }: TAppPropsWithLayout) => {
     const getLayout = Component.getLayout ?? (page => page)
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <ReactQueryDevtools position="bottom-right" />
-            <Hydrate state={pageProps?.dehydratedState}>
-                <DataServiceProvider dataService={dataService}>
-                    <AuthServiceProvider authService={authService}>
-                        <RealtimeServiceProvider realtimeService={realtimeService}>
-                            <NextThemeProvider defaultTheme="system" attribute="class" value={themeProviderValues}>
-                                <NextUIProvider>{getLayout(<Component {...pageProps} />)}</NextUIProvider>
-                            </NextThemeProvider>
-                        </RealtimeServiceProvider>
-                    </AuthServiceProvider>
-                </DataServiceProvider>
-            </Hydrate>
-        </QueryClientProvider>
+        <>
+            <DefaultSeo defaultTitle="Taskly" titleTemplate="Taskly | %s" description="Organize your tasks at ease!" />
+            <QueryClientProvider client={queryClient}>
+                <ReactQueryDevtools position="bottom-right" />
+                <Hydrate state={pageProps?.dehydratedState}>
+                    <DataServiceProvider dataService={dataService}>
+                        <AuthServiceProvider authService={authService}>
+                            <RealtimeServiceProvider realtimeService={realtimeService}>
+                                <NextThemeProvider defaultTheme="system" attribute="class" value={themeProviderValues}>
+                                    <NextUIProvider>{getLayout(<Component {...pageProps} />)}</NextUIProvider>
+                                </NextThemeProvider>
+                            </RealtimeServiceProvider>
+                        </AuthServiceProvider>
+                    </DataServiceProvider>
+                </Hydrate>
+            </QueryClientProvider>
+        </>
     )
 }
 

@@ -1,10 +1,12 @@
 import { Grid, Row, Table, Text } from '@nextui-org/react'
 import { AppLayout, AppPageAppBar, AppPageContainer } from 'components'
 import Link from 'next/link'
+import { NextSeo } from 'next-seo'
 
 const AppTasksPage = () => {
     return (
         <>
+            <NextSeo title="My Tasks" />
             <AppPageAppBar title="My Tasks">
                 <Row>
                     <Link passHref href="/dashboard">
