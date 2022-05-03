@@ -67,6 +67,7 @@ const LandingHeader = () => {
 
                     <Row fluid justify="flex-end" align="center">
                         <Switch
+                            color="secondary"
                             onChange={handleThemeChange}
                             checked={isDark}
                             iconOn={<MoonIcon />}
@@ -76,6 +77,7 @@ const LandingHeader = () => {
                         {isAuthenticated ? (
                             <>
                                 <Button
+                                    color="secondary"
                                     iconRight={logoutMutation.isLoading && <Loading color="currentColor" size="xs" />}
                                     disabled={logoutMutation.isLoading}
                                     shadow
@@ -88,7 +90,7 @@ const LandingHeader = () => {
 
                                 <Spacer x={1} />
                                 <Link passHref href="/app">
-                                    <Button as="a" shadow auto>
+                                    <Button color="secondary" as="a" shadow auto>
                                         Play with Taskly
                                     </Button>
                                 </Link>

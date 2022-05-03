@@ -1,5 +1,6 @@
 export * from './AppBar'
 export * from './AppCurrentUser'
+export * from './AppFeatureBar'
 export * from './AppPageAppBar'
 export * from './AppPageContainer'
 export * from './AppSidebar'

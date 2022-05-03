@@ -49,7 +49,7 @@ const AppLayout = ({ children }: TAppLayoutProps) => {
                     css={{ minHeight: '100vh', position: 'relative' }}
                 >
                     <AppSidebar />
-                    <Container fluid responsive={false} gap={0} css={{ flex: '1' }}>
+                    <Container fluid display="flex" direction="column" responsive={false} gap={0} css={{ flex: '1' }}>
                         {children}
                     </Container>
                 </Container>

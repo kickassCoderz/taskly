@@ -15,6 +15,7 @@ const AppBar = ({ children, sticky = false, bottomBorder = true }: TAppBarProps)
             responsive={false}
             gap={0}
             css={{
+                zIndex: '$max',
                 height: '$17',
                 backgroundColor: '$backgroundContrast',
                 ...(sticky && {

@@ -1,8 +1,9 @@
 //@ts-nocheck
 //@TODO: open issue to ts
 import { styled } from '@nextui-org/react'
+import { forwardRef } from 'react'
 
-const Badge = styled('span', {
+const BadgeStyled = styled('span', {
     display: 'inline-block',
     textTransform: 'uppercase',
     padding: '5px 5px',
@@ -51,5 +52,20 @@ const Badge = styled('span', {
         type: 'default'
     }
 })
+
+type TBadgeProps = {
+    children: React.ReactNode
+    color?: 'default' | 'primary' | 'secondary' | 'error' | 'success' | 'warning'
+}
+
+const Badge = forwardRef<HTMLElement, TBadgeProps>(({ color = 'default', children }, ref) => {
+    return (
+        <BadgeStyled ref={ref} type={color}>
+            {children}
+        </BadgeStyled>
+    )
+})
+
+Badge.displayName = 'Badge'
 
 export { Badge }

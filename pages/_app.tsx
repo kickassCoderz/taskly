@@ -20,7 +20,16 @@ type TAppPropsWithLayout = AppProps & {
 }
 
 const App = ({ Component, pageProps }: TAppPropsWithLayout) => {
-    const [queryClient] = useState(() => new QueryClient())
+    const [queryClient] = useState(
+        () =>
+            new QueryClient({
+                defaultOptions: {
+                    queries: {
+                        refetchOnWindowFocus: 'always'
+                    }
+                }
+            })
+    )
 
     const getLayout = Component.getLayout ?? (page => page)
 

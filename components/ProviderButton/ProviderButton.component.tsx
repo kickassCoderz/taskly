@@ -1,7 +1,7 @@
 import { useGetList, useLogin } from '@kickass-admin'
 import { Button, ButtonProps } from '@nextui-org/react'
 import { useSessions } from 'hooks'
-import { ElementType, FC, MouseEventHandler } from 'react'
+import { ElementType, FC, MouseEventHandler, useMemo } from 'react'
 import { EAuthProvider, EFilterOperators, ELoginType, TLoginParams, TWebhook } from 'types'
 
 const WEBHOOKS = {
@@ -15,11 +15,12 @@ const ProviderButton: FC<
         iconComponent: ElementType
         provider: EAuthProvider
         label?: string
+        labelOverride?: string
         scopes: string[]
         onClick?: MouseEventHandler<HTMLButtonElement>
         redirectPath?: string
     } & ButtonProps
-> = ({ iconComponent: Icon, provider, label = provider, scopes, onClick, redirectPath, ...rest }) => {
+> = ({ iconComponent: Icon, provider, label = provider, scopes, onClick, redirectPath, labelOverride, ...rest }) => {
     const sessions = useSessions()
     const session = sessions?.[0]
     const loginMutation = useLogin<TLoginParams>()
@@ -53,12 +54,22 @@ const ProviderButton: FC<
 
     const isConnected = !!webhooks?.length
 
+    const resolvedLabel = useMemo(() => {
+        if (labelOverride) {
+            return labelOverride
+        }
+
+        return `${isConnected ? 'Manage' : 'Connect'} ${label}`
+    }, [isConnected, label, labelOverride])
+
     return (
         <Button
-            iconRight={<Icon />}
+            auto
+            flat
+            size="xs"
+            iconRight={<Icon size={12} />}
             disabled={!session}
             color="primary"
-            ghost
             onClick={event => {
                 if (!sessions?.find(item => item.provider === provider)) {
                     const redirectUrl = new URL(window.location.toString())
@@ -81,7 +92,7 @@ const ProviderButton: FC<
             }}
             {...rest}
         >
-            {isConnected ? 'Manage' : 'Connect'} {label}
+            {resolvedLabel}
         </Button>
     )
 }

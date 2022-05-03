@@ -31,7 +31,7 @@ const createAppwriteChannel = (channel: string, ids?: string[]) => {
         return channel
     }
 
-    return ids?.length ? ids.map(id => `collections.${channel}.document.${id}`) : `collections.${channel}.document`
+    return ids?.length ? ids.map(id => `collections.${channel}.documents.${id}`) : `collections.${channel}.documents`
 }
 
 type TOnChangeEvent<TPayload> = {
@@ -41,18 +41,18 @@ type TOnChangeEvent<TPayload> = {
     payload: TPayload
 }
 
-export type TRealtimeParams = {
+export type TRealtimeParams<TPayload> = {
     channel: string
     eventTypes: ESubscriptionEventTypes[]
     params?: {
         ids?: string[]
     }
-    onChange: <TPayload>(event: TOnChangeEvent<TPayload>) => void
+    onChange: (event: TOnChangeEvent<TPayload>) => void
 }
 
 const realtimeService: IRealtimeService = {
     subscribe(subscribeParams) {
-        const { channel, eventTypes, params, onChange } = subscribeParams as TRealtimeParams
+        const { channel, eventTypes, params, onChange } = subscribeParams as TRealtimeParams<any>
 
         const appwriteChannel = createAppwriteChannel(channel, params?.ids)
 
