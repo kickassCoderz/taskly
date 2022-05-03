@@ -254,7 +254,11 @@ const AppTasksPage = () => {
                                                     color="primary"
                                                     size="xs"
                                                     icon={<EditIcon size={20} />}
-                                                    onClick={() => alert(`Edit task ${task.id}`)}
+                                                    onClick={() => {
+                                                        router.push({
+                                                            pathname: `/app/tasks/${task.id}`
+                                                        })
+                                                    }}
                                                 />
                                             </Tooltip>
                                         </Col>
