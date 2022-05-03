@@ -16,8 +16,9 @@ const useGetOne = <TResponseData extends TBaseResponse, TResponseError>(
 ) => {
     const dataService = useDataService()
     const queryKey = useMemo(
-        () => createResourceQueryKey(EResourceBaseQueryKeyType.One, variables?.resource),
-        [variables?.resource]
+        // @NOTE: useGetOne key was the same for all resources, added variables.params to differentiate
+        () => createResourceQueryKey(EResourceBaseQueryKeyType.One, variables?.resource, variables.params),
+        [variables?.resource, variables.params]
     )
 
     const getOneQuery = useQuery<TGetOneResponseData<TResponseData>, TResponseError>(

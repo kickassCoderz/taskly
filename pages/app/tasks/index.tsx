@@ -2,6 +2,7 @@ import {
     createResourceBaseQueryKey,
     EResourceBaseQueryKeyType,
     ESortOrder,
+    useDeleteOne,
     useGetList,
     useRealtimeSubscription
 } from '@kickass-admin'
@@ -42,6 +43,8 @@ const AppTasksPage = () => {
     const [isGitHubProviderModalOpen, setGitHubProviderModalOpen] = useState(false)
     const [isGitLabProviderModalOpen, setGitLabProviderModalOpen] = useState(false)
     const [isImportPopperOpen, setIsImportPopperOpen] = useState(false)
+
+    const deleteMutation = useDeleteOne()
 
     useRealtimeSubscription<TRealtimeParams<TTask>>({
         enabled: !!session,
@@ -251,7 +254,11 @@ const AppTasksPage = () => {
                                                     color="primary"
                                                     size="xs"
                                                     icon={<EditIcon size={20} />}
-                                                    onClick={() => alert(`Edit task ${task.id}`)}
+                                                    onClick={() => {
+                                                        router.push({
+                                                            pathname: `/app/tasks/${task.id}`
+                                                        })
+                                                    }}
                                                 />
                                             </Tooltip>
                                         </Col>
@@ -260,7 +267,18 @@ const AppTasksPage = () => {
                                                 css={{ whiteSpace: 'nowrap' }}
                                                 content="Delete task"
                                                 color="error"
-                                                onClick={() => alert(`Delete task ${task.id}`)}
+                                                onClick={() => {
+                                                    if (deleteMutation.isLoading) {
+                                                        return
+                                                    }
+
+                                                    deleteMutation.mutate({
+                                                        resource: 'tasks',
+                                                        params: {
+                                                            id: task.id
+                                                        }
+                                                    })
+                                                }}
                                             >
                                                 <Button
                                                     auto
