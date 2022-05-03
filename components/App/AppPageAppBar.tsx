@@ -21,7 +21,7 @@ const AppPageAppBar = ({ title }: TAppPageAppBarProps) => {
         <AppBar sticky>
             <Row align="center" justify="space-between" gap={1}>
                 <Col span={12} css={{ display: 'flex', alignItems: 'center' }}>
-                    {isOpen && (
+                    {!isOpen && (
                         <>
                             <Button
                                 css={{ padding: 0 }}
