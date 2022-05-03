@@ -1,5 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useGetOne, useUpdateOne } from '@kickass-admin'
+import {
+    createResourceBaseQueryKey,
+    EResourceBaseQueryKeyType,
+    TGetListResponseData,
+    useGetOne,
+    useUpdateOne
+} from '@kickass-admin'
 import { Button, Col, Grid, Input, Loading, Row, Spacer, Text } from '@nextui-org/react'
 import { AppwriteException } from 'appwrite'
 import { AppFeatureBar, AppLayout, AppPageAppBar, AppPageContainer } from 'components'
@@ -8,10 +14,12 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useCallback, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
+import { useQueryClient } from 'react-query'
 import { TTask } from 'types'
 import { editValidationSchema } from 'validationSchemas'
 
 const AppTaskPage = () => {
+    const queryClient = useQueryClient()
     const session = useSessions()?.[0]
     const router = useRouter()
     const taskId = router.query.id as string
@@ -26,7 +34,16 @@ const AppTaskPage = () => {
         },
         {
             enabled: !!session && !!taskId,
-            refetchOnWindowFocus: false
+            refetchOnWindowFocus: false,
+            initialData: () =>
+                queryClient
+                    .getQueryData<TGetListResponseData<TTask[]>>(
+                        createResourceBaseQueryKey(EResourceBaseQueryKeyType.List, 'tasks'),
+                        {
+                            exact: false
+                        }
+                    )
+                    ?.data.find(item => item.id === taskId)
         }
     )
 
@@ -62,8 +79,6 @@ const AppTaskPage = () => {
 
     const handleUpdate = useCallback(
         (formData: TTask) => {
-            console.log(formData)
-
             if (updateMutation.isLoading) {
                 return
             }
@@ -98,16 +113,22 @@ const AppTaskPage = () => {
             <AppPageAppBar title={pageTitle} />
             <AppFeatureBar>
                 <Row gap={1} align="center" justify="center">
-                    <Col css={{ display: 'flex', justifyContent: 'flex-start' }}>
-                        <div>palceholder left</div>
-                    </Col>
+                    <Col css={{ display: 'flex', justifyContent: 'flex-start' }}></Col>
                     <Col css={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <div>palceholder right</div>
+                        <Button
+                            disabled={updateMutation.isLoading}
+                            size="xs"
+                            iconRight={updateMutation.isLoading && <Loading color="currentColor" size="sm" />}
+                            type="submit"
+                            onClick={handleSubmit(handleUpdate)}
+                        >
+                            Save
+                        </Button>
                     </Col>
                 </Row>
             </AppFeatureBar>
             <AppPageContainer>
-                <Grid.Container gap={2} onSubmit={handleSubmit(handleUpdate)}>
+                <Grid.Container gap={2}>
                     <Grid as="form">
                         <Input
                             {...register('title')}
@@ -128,16 +149,6 @@ const AppTaskPage = () => {
                                 <Spacer y={1.2} />
                             </>
                         )}
-                        <Button
-                            disabled={updateMutation.isLoading}
-                            iconRight={updateMutation.isLoading && <Loading color="currentColor" size="sm" />}
-                            type="submit"
-                            onSubmit={() => {
-                                console.log('peder')
-                            }}
-                        >
-                            Save
-                        </Button>
                     </Grid>
                 </Grid.Container>
             </AppPageContainer>
