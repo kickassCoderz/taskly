@@ -1,4 +1,4 @@
-import { createResourceBaseQueryKey, EResourceBaseQueryKeyType, useGetList, useLogin } from '@kickass-admin'
+import { createResourceBaseQueryKey, EResourceBaseQueryKeyType, ESortOrder, useGetList } from '@kickass-admin'
 import { Grid, Link as NextUILink, Row, Table, Text, Tooltip } from '@nextui-org/react'
 import {
     AppLayout,
@@ -17,7 +17,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import { useQueryClient } from 'react-query'
-import { EAuthProvider, TLoginParams, TTask } from 'types'
+import { EAuthProvider, TTask } from 'types'
 
 const AppTasksPage = () => {
     const appwrite = useAppwrite()
@@ -27,7 +27,6 @@ const AppTasksPage = () => {
     const router = useRouter()
     const [isGitHubProviderModalOpen, setGitHubProviderModalOpen] = useState(false)
     const [isGitLabProviderModalOpen, setGitLabProviderModalOpen] = useState(false)
-    const loginMutation = useLogin<TLoginParams>()
 
     const { data: tasks, isLoading } = useGetList<TTask[], Error>(
         {
@@ -36,7 +35,13 @@ const AppTasksPage = () => {
                 pagination: {
                     page: 1,
                     perPage: 100
-                }
+                },
+                sort: [
+                    {
+                        field: '$id',
+                        order: ESortOrder.Desc
+                    }
+                ]
             }
         },
         {
