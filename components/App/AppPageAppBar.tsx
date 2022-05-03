@@ -13,7 +13,7 @@ type TAppPageAppBarProps = {
     children?: React.ReactNode
 }
 
-const AppPageAppBar = ({ children, title }: TAppPageAppBarProps) => {
+const AppPageAppBar = ({ title }: TAppPageAppBarProps) => {
     const { isOpen, toggleNav } = useAppNavigation()
     const userQuery = useGetUser<TUserModel>()
 

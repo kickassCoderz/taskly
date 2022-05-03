@@ -1,5 +1,4 @@
-import { Container, Link as NextUILink, Row, Spacer, Text } from '@nextui-org/react'
-import Link from 'next/link'
+import { Container, Link as NextUILink, Row, Text } from '@nextui-org/react'
 
 const LandingFooter = () => {
     return (

@@ -12,7 +12,7 @@ import { authService, dataService, realtimeService } from 'services'
 import { themeProviderValues } from '../theme'
 
 type TNextPageWithLayout = NextPage & {
-    getLayout?: (page: React.ReactElement) => JSX.Element
+    getLayout?: (_page: React.ReactElement) => JSX.Element
 }
 
 type TAppPropsWithLayout = AppProps & {

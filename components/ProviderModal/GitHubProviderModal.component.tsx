@@ -15,7 +15,7 @@ const ProviderModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
     const session = useMemo(() => {
         return sessions?.find(item => item.provider === 'github')
     }, [sessions])
-    const [search, setSearch] = useState('')
+    // const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [total, setTotal] = useState(0)
     const appwrite = useAppwrite()
