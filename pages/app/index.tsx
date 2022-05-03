@@ -1,4 +1,4 @@
-import { Container, Row, Text, Tooltip } from '@nextui-org/react'
+import { Grid, Spacer, Text, Tooltip } from '@nextui-org/react'
 import {
     AppLayout,
     AppPageAppBar,
@@ -6,6 +6,7 @@ import {
     GithubIcon,
     GitlabIcon,
     ProviderButton,
+    TasksIlustration,
     TrelloIcon
 } from 'components'
 import { useRouter } from 'next/router'
@@ -20,35 +21,16 @@ const AppHomePage = () => {
             <NextSeo title="Home" />
             <AppPageAppBar title="Home" />
             <AppPageContainer>
-                <Container
-                    css={{
-                        display: 'flex',
-                        flex: 1,
-                        height: '100vh',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        flexDirection: 'column'
-                    }}
-                >
-                    <Text h2>Ready to kick some of your tasks?</Text>
-                    <Text
-                        css={{
-                            marginTop: 10
-                        }}
-                        h4
-                    >
-                        Start by connecting some of your services
-                    </Text>
-                    <Row
-                        css={{
-                            marginTop: 40
-                        }}
-                        justify="center"
-                    >
+                <Grid.Container gap={7}>
+                    <Grid xs={12} alignItems="center" justify="center">
+                        <TasksIlustration />
+                    </Grid>
+                    <Grid xs={12} direction="column" alignItems="center" justify="center">
+                        <Text h2>Ready to kick some of your tasks?</Text>
+                        <Text size={24}>Start by connecting some of your services</Text>
+                    </Grid>
+                    <Grid xs={12} alignItems="center" justify="center">
                         <ProviderButton
-                            css={{
-                                marginLeft: 20
-                            }}
                             iconComponent={GithubIcon}
                             provider={EAuthProvider.Github}
                             label="GitHub"
@@ -63,10 +45,8 @@ const AppHomePage = () => {
                                 })
                             }}
                         />
+                        <Spacer x={1} />
                         <ProviderButton
-                            css={{
-                                marginLeft: 20
-                            }}
                             iconComponent={GitlabIcon}
                             provider={EAuthProvider.Gitlab}
                             label="GitLab"
@@ -81,6 +61,7 @@ const AppHomePage = () => {
                                 })
                             }}
                         />
+                        <Spacer x={1} />
                         <Tooltip
                             css={{
                                 textTransform: 'uppercase',
@@ -91,9 +72,6 @@ const AppHomePage = () => {
                             placement="bottom"
                         >
                             <ProviderButton
-                                css={{
-                                    marginLeft: 20
-                                }}
                                 iconComponent={TrelloIcon}
                                 provider={EAuthProvider.Trello}
                                 label="Trello"
@@ -101,8 +79,8 @@ const AppHomePage = () => {
                                 disabled
                             />
                         </Tooltip>
-                    </Row>
-                </Container>
+                    </Grid>
+                </Grid.Container>
             </AppPageContainer>
         </>
     )

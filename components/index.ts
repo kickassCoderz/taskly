@@ -1,6 +1,7 @@
 export * from './App'
 export * from './Base'
 export * from './Icons'
+export * from './Ilustrations'
 export * from './Landing'
 export * from './Layouts'
 export * from './ProviderButton'
