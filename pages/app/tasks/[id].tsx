@@ -130,6 +130,14 @@ const AppTaskPage = () => {
             <AppPageContainer>
                 <Grid.Container gap={2}>
                     <Grid as="form">
+                        {!!updateMutation.error && (
+                            <>
+                                <Text h5 color="error">
+                                    Error: {updateMutation.error.message}
+                                </Text>
+                                <Spacer y={1.2} />
+                            </>
+                        )}
                         <Input
                             {...register('title')}
                             type="text"
@@ -141,14 +149,6 @@ const AppTaskPage = () => {
                             placeholder="Title"
                         />
                         <Spacer y={1.2} />
-                        {!!updateMutation.error && (
-                            <>
-                                <Text h5 color="error">
-                                    Error: {updateMutation.error.message}
-                                </Text>
-                                <Spacer y={1.2} />
-                            </>
-                        )}
                     </Grid>
                 </Grid.Container>
             </AppPageContainer>
