@@ -93,7 +93,7 @@ const AppTaskCreatePage = () => {
                             {/* TODO maybe some fancy icon? */}
                             {isPreviewEnabled ? 'Edit' : 'Preview'}
                         </Button>
-                        <Spacer x={0.6} />
+                        <Spacer x={0.5} />
                         <Button
                             disabled={createMutation.isLoading}
                             size="xs"

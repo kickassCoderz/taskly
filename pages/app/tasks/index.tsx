@@ -6,7 +6,19 @@ import {
     useGetList,
     useRealtimeSubscription
 } from '@kickass-admin'
-import { Button, Col, Grid, Input, Popover, Row, Spacer, Table, Text, Tooltip } from '@nextui-org/react'
+import {
+    Button,
+    Col,
+    Grid,
+    Input,
+    Link as NextUILink,
+    Popover,
+    Row,
+    Spacer,
+    Table,
+    Text,
+    Tooltip
+} from '@nextui-org/react'
 import {
     AppFeatureBar,
     AppLayout,
@@ -28,6 +40,7 @@ import {
     TrelloIcon
 } from 'components'
 import { useSessions } from 'hooks'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useCallback, useEffect, useState } from 'react'
@@ -136,6 +149,14 @@ const AppTasksPage = () => {
                         />
                     </Col>
                     <Col css={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Link passHref href="/app/tasks/create">
+                            <NextUILink>
+                                <Button href="/app/tasks/create" auto size="xs" color="gradient">
+                                    Create new task
+                                </Button>
+                            </NextUILink>
+                        </Link>
+                        <Spacer x={0.5} />
                         <Button auto flat size="xs" icon={<FilterIcon size={12} />}>
                             Filter
                         </Button>
