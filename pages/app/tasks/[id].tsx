@@ -180,12 +180,14 @@ const AppTaskPage = () => {
                                                 Content
                                             </Text>
                                             {isPreviewEnabled ? (
-                                                <MarkdownPreview
-                                                    style={{
-                                                        padding: 20
-                                                    }}
-                                                    source={value}
-                                                />
+                                                <div data-color-mode={theme.isDark ? 'dark' : 'light'}>
+                                                    <MarkdownPreview
+                                                        style={{
+                                                            padding: 20
+                                                        }}
+                                                        source={value}
+                                                    />
+                                                </div>
                                             ) : (
                                                 <CodeMirror
                                                     theme={theme.isDark ? 'dark' : 'light'}
