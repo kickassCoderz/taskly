@@ -183,7 +183,9 @@ const AppTaskPage = () => {
                                                 <div data-color-mode={theme.isDark ? 'dark' : 'light'}>
                                                     <MarkdownPreview
                                                         style={{
-                                                            padding: 20
+                                                            padding: 20,
+                                                            width: '100vw',
+                                                            maxWidth: '800px'
                                                         }}
                                                         source={value}
                                                     />
@@ -192,6 +194,7 @@ const AppTaskPage = () => {
                                                 <CodeMirror
                                                     theme={theme.isDark ? 'dark' : 'light'}
                                                     value={value || ''}
+                                                    width="100vw"
                                                     maxWidth="800px"
                                                     height="400px"
                                                     extensions={[markdown({})]}
