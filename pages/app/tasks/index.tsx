@@ -31,9 +31,12 @@ import { useSessions } from 'hooks'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useCallback, useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { useQueryClient } from 'react-query'
 import { ESubscriptionEventTypes, TRealtimeParams } from 'services'
 import { EAuthProvider, TTask } from 'types'
+
+const allowMarkdownElement = () => false
 
 const AppTasksPage = () => {
     const queryClient = useQueryClient()
@@ -221,7 +224,9 @@ const AppTasksPage = () => {
                                             maxWidth: '$60'
                                         }}
                                     >
-                                        {task.content}
+                                        <ReactMarkdown skipHtml allowElement={allowMarkdownElement} unwrapDisallowed>
+                                            {task.content}
+                                        </ReactMarkdown>
                                     </Text>
                                 </Table.Cell>
                                 <Table.Cell>{task.id}</Table.Cell>
