@@ -52,6 +52,9 @@ module.exports = async (req, res) => {
             throwError('webhook not found', 404)
         }
 
+        const defaultPermissionsRead = [`user:${webhook.userId}`]
+        const defaultPermissionsWrite = [`user:${webhook.userId}`]
+
         const providerAccessToken = payload.pT
 
         if (!providerAccessToken) {
@@ -96,7 +99,12 @@ module.exports = async (req, res) => {
 
             const existingTask = (
                 await database.listDocuments('tasks', [sdk.Query.equal('providerId', issue.id.toString())])
-            )?.documents?.[0]
+            )?.documents?.find(item => {
+                const isOwnedByUser =
+                    item.$read.includes(defaultPermissionsRead[0]) && item.$write.includes(defaultPermissionsWrite[0])
+
+                return isOwnedByUser
+            })
 
             const task = {
                 ...existingTask,
@@ -107,9 +115,6 @@ module.exports = async (req, res) => {
                 providerId: issue.id.toString(),
                 provider: 'github'
             }
-
-            const defaultPermissionsRead = [`user:${webhook.userId}`]
-            const defaultPermissionsWrite = [`user:${webhook.userId}`]
 
             if (existingTask) {
                 await database

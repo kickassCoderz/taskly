@@ -32,6 +32,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             throwError('bad request', 400)
         }
 
+        const defaultPermissionsRead = [`user:${id}`]
+        const defaultPermissionsWrite = [`user:${id}`]
+
         // TODO authenticate github
         // https://docs.github.com/en/developers/webhooks-and-events/webhooks/securing-your-webhooks
 
@@ -57,9 +60,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     return res.status(201).json({ message: 'ok' })
                 }
 
-                const existingTask = (
+                const existingTask: Models.Document | undefined = (
                     await appwriteDatabase.listDocuments('tasks', [Query.equal('providerId', issue.id.toString())])
-                )?.documents?.[0]
+                )?.documents?.find(item => {
+                    const isOwnedByUser =
+                        item.$read.includes(defaultPermissionsRead[0]) &&
+                        item.$write.includes(defaultPermissionsWrite[0])
+
+                    return isOwnedByUser
+                })
 
                 const task = {
                     ...existingTask,
@@ -71,15 +80,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     provider: 'github'
                 }
 
-                const defaultPermissionsRead = [`user:${id}`]
-                const defaultPermissionsWrite = [`user:${id}`]
-
                 let result
 
                 switch (action) {
                     case 'deleted':
                         if (!existingTask) {
                             throwError('not found', 404)
+
+                            return
                         }
 
                         await appwriteDatabase.deleteDocument('tasks', existingTask.$id)

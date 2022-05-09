@@ -32,6 +32,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             throwError('bad request', 400)
         }
 
+        const defaultPermissionsRead = [`user:${id}`]
+        const defaultPermissionsWrite = [`user:${id}`]
+
         // TODO authenticate gitlab
         // https://docs.gitlab.com/ee/user/project/integrations/webhooks.html#validate-payloads-by-using-a-secret-token
 
@@ -50,9 +53,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     throwError('bad request', 400)
                 }
 
-                const existingTask = (
+                const existingTask: Models.Document | undefined = (
                     await appwriteDatabase.listDocuments('tasks', [Query.equal('providerId', issue.id.toString())])
-                )?.documents?.[0]
+                )?.documents?.find(item => {
+                    const isOwnedByUser =
+                        item.$read.includes(defaultPermissionsRead[0]) &&
+                        item.$write.includes(defaultPermissionsWrite[0])
+
+                    return isOwnedByUser
+                })
 
                 const task = {
                     ...existingTask,
@@ -63,9 +72,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     providerId: issue.id.toString(),
                     provider: 'gitlab'
                 }
-
-                const defaultPermissionsRead = [`user:${id}`]
-                const defaultPermissionsWrite = [`user:${id}`]
 
                 let result
 
