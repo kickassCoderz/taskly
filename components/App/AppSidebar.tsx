@@ -8,8 +8,6 @@ import { AppSidebarNavigation } from './AppSidebarNavigation'
 const AppSidebar = () => {
     const { isOpen, toggleNav } = useAppNavigation()
 
-    console.log(isOpen)
-
     return (
         <>
             {isOpen && (
