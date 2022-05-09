@@ -1,3 +1,6 @@
+import '@uiw/react-markdown-preview/markdown.css'
+
+import { markdown } from '@codemirror/lang-markdown'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
     createResourceBaseQueryKey,
@@ -7,16 +10,20 @@ import {
     useUpdateOne
 } from '@kickass-admin'
 import { Button, Col, Grid, Input, Loading, Row, Spacer, Text } from '@nextui-org/react'
+import CodeMirror from '@uiw/react-codemirror'
 import { AppwriteException } from 'appwrite'
 import { AppFeatureBar, AppLayout, AppPageAppBar, AppPageContainer } from 'components'
-import { useSessions } from 'hooks'
+import { useSessions, useTheme } from 'hooks'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import { useCallback, useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { useQueryClient } from 'react-query'
 import { TTask } from 'types'
 import { editValidationSchema } from 'validationSchemas'
+
+const MarkdownPreview = dynamic(() => import('@uiw/react-markdown-preview'), { ssr: false })
 
 const AppTaskPage = () => {
     const queryClient = useQueryClient()
@@ -24,6 +31,8 @@ const AppTaskPage = () => {
     const router = useRouter()
     const taskId = router.query.id as string
     const defaultValuesSet = useRef(false)
+    const theme = useTheme()
+    const [isPreviewEnabled, setPreviewEnabled] = useState(false)
 
     const { data: task } = useGetOne<TTask, Error>(
         {
@@ -53,6 +62,7 @@ const AppTaskPage = () => {
 
     const {
         register,
+        control,
         handleSubmit,
         formState: { errors },
         reset
@@ -116,6 +126,16 @@ const AppTaskPage = () => {
                     <Col css={{ display: 'flex', justifyContent: 'flex-start' }}></Col>
                     <Col css={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <Button
+                            size="xs"
+                            onClick={() => {
+                                setPreviewEnabled(current => !current)
+                            }}
+                        >
+                            {/* TODO maybe some fancy icon? */}
+                            {isPreviewEnabled ? 'Edit' : 'Preview'}
+                        </Button>
+                        <Spacer x={0.6} />
+                        <Button
                             disabled={updateMutation.isLoading}
                             size="xs"
                             iconRight={updateMutation.isLoading && <Loading color="currentColor" size="sm" />}
@@ -147,6 +167,43 @@ const AppTaskPage = () => {
                             bordered
                             label="Title"
                             placeholder="Title"
+                        />
+                        <Spacer y={1.2} />
+                        <Controller
+                            control={control}
+                            name="content"
+                            render={({ field: { value, onChange } }) => {
+                                return (
+                                    <>
+                                        <Col>
+                                            <Text style={{ marginLeft: 10 }} color="primary">
+                                                Content
+                                            </Text>
+                                            {isPreviewEnabled ? (
+                                                <div data-color-mode={theme.isDark ? 'dark' : 'light'}>
+                                                    <MarkdownPreview
+                                                        style={{
+                                                            padding: 20
+                                                        }}
+                                                        source={value}
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <CodeMirror
+                                                    theme={theme.isDark ? 'dark' : 'light'}
+                                                    value={value || ''}
+                                                    maxWidth="800px"
+                                                    height="400px"
+                                                    extensions={[markdown({})]}
+                                                    onChange={(value, _viewUpdate) => {
+                                                        onChange(value)
+                                                    }}
+                                                />
+                                            )}
+                                        </Col>
+                                    </>
+                                )
+                            }}
                         />
                         <Spacer y={1.2} />
                     </Grid>
