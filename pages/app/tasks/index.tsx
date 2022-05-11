@@ -2,6 +2,7 @@ import {
     createResourceBaseQueryKey,
     EResourceBaseQueryKeyType,
     ESortOrder,
+    TGetListResponseData,
     useDeleteOne,
     useGetList,
     useRealtimeSubscription
@@ -35,7 +36,6 @@ import {
     LinkIcon,
     ProviderButton,
     SearchIcon,
-    SortIcon,
     TrashIcon,
     TrelloIcon
 } from 'components'
@@ -47,9 +47,24 @@ import { useCallback, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { useQueryClient } from 'react-query'
 import { ESubscriptionEventTypes, TRealtimeParams } from 'services'
-import { EAuthProvider, TTask } from 'types'
+import { EAuthProvider, EFilterOperators, TTask } from 'types'
 
 const allowMarkdownElement = () => false
+
+const defaultSort = {
+    field: '$id',
+    order: ESortOrder.Desc
+}
+
+const statusColorMap: Record<string, 'default' | 'primary' | 'secondary' | 'error' | 'success' | 'warning'> = {
+    open: 'success',
+    opened: 'success',
+    closed: 'error'
+}
+
+const statusTextMap: Record<string, string> = {
+    opened: 'open'
+}
 
 const AppTasksPage = () => {
     const queryClient = useQueryClient()
@@ -59,6 +74,7 @@ const AppTasksPage = () => {
     const [isGitHubProviderModalOpen, setGitHubProviderModalOpen] = useState(false)
     const [isGitLabProviderModalOpen, setGitLabProviderModalOpen] = useState(false)
     const [isImportPopperOpen, setIsImportPopperOpen] = useState(false)
+    const { field = defaultSort.field, order = defaultSort.order, search = '', status } = router.query
 
     const deleteMutation = useDeleteOne()
 
@@ -76,6 +92,38 @@ const AppTasksPage = () => {
         }, [queryClient])
     })
 
+    const setQueryState = useCallback(
+        (values: Record<string, string>) => {
+            const newQuery = {
+                ...router.query,
+                ...values
+            }
+
+            router.replace(
+                {
+                    pathname: router.pathname,
+                    query: Object.keys(newQuery).reduce((acc, item) => {
+                        const value = newQuery[item]
+
+                        if (!value) {
+                            return acc
+                        }
+
+                        return {
+                            ...acc,
+                            [item]: value
+                        }
+                    }, {})
+                },
+                undefined,
+                {
+                    shallow: true
+                }
+            )
+        },
+        [router]
+    )
+
     const { data: tasks, isLoading } = useGetList<TTask[], Error>(
         {
             resource: 'tasks',
@@ -86,15 +134,43 @@ const AppTasksPage = () => {
                 },
                 sort: [
                     {
-                        field: '$id',
-                        order: ESortOrder.Desc
+                        field: field as string,
+                        order: order as ESortOrder
                     }
-                ]
+                ],
+                filter: [
+                    {
+                        operator: EFilterOperators.Contains,
+                        field: 'title',
+                        value: search
+                    }
+                ].filter(item => !!item.value)
             }
         },
         {
             enabled: !!session,
-            staleTime: Infinity
+            staleTime: Infinity,
+            select: useCallback(
+                (data: TGetListResponseData<TTask[]>): TGetListResponseData<TTask[]> => {
+                    if (!data) {
+                        return data
+                    }
+
+                    if (!status) {
+                        return data
+                    }
+
+                    const filteredData = data.data.filter(
+                        item => (statusTextMap[item.status] || item.status) === status
+                    )
+
+                    return {
+                        data: filteredData,
+                        total: filteredData.length
+                    }
+                },
+                [status]
+            )
         }
     )
 
@@ -146,6 +222,13 @@ const AppTasksPage = () => {
                             contentLeft={<SearchIcon size={16} />}
                             size="xs"
                             placeholder="Search"
+                            fullWidth
+                            value={search}
+                            onChange={event => {
+                                setQueryState({
+                                    search: event.target.value || ''
+                                })
+                            }}
                         />
                     </Col>
                     <Col css={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -157,13 +240,45 @@ const AppTasksPage = () => {
                             </NextUILink>
                         </Link>
                         <Spacer x={0.5} />
-                        <Button auto flat size="xs" icon={<FilterIcon size={12} />}>
-                            Filter
+                        <Button
+                            auto
+                            flat
+                            size="xs"
+                            icon={<FilterIcon size={12} />}
+                            color={statusColorMap[status as string] || 'default'}
+                            onClick={() => {
+                                const nextStatus = {
+                                    open: 'closed',
+                                    closed: '',
+                                    undefined: 'open'
+                                }[status as string]
+
+                                if (typeof nextStatus === 'undefined') {
+                                    setQueryState({
+                                        status: 'open'
+                                    })
+                                } else {
+                                    setQueryState({
+                                        status: nextStatus
+                                    })
+                                }
+                            }}
+                        >
+                            Status
+                            {!!status && (
+                                <Text
+                                    as="span"
+                                    color="currentColor"
+                                    css={{
+                                        textTransform: 'capitalize'
+                                    }}
+                                >
+                                    :&nbsp;
+                                    {status}
+                                </Text>
+                            )}
                         </Button>
                         <Spacer x={0.5} />
-                        <Button auto flat size="xs" icon={<SortIcon size={12} />}>
-                            Sort
-                        </Button>
                         <Spacer x={0.5} />
                         <Popover isOpen={isImportPopperOpen} onOpenChange={setIsImportPopperOpen}>
                             <Popover.Trigger>
@@ -222,12 +337,37 @@ const AppTasksPage = () => {
                 </Row>
             </AppFeatureBar>
             <AppPageContainer>
-                <Table aria-label="My Tasks" shadow={false}>
+                <Table
+                    aria-label="My Tasks"
+                    shadow={false}
+                    sortDescriptor={{
+                        column: field as string,
+                        direction: order === ESortOrder.Asc ? 'ascending' : 'descending'
+                    }}
+                    onSortChange={value => {
+                        if (!value.column || !value.direction) {
+                            setQueryState({
+                                ...defaultSort
+                            })
+                        } else {
+                            setQueryState({
+                                field: value.column.toString(),
+                                order: value.direction === 'ascending' ? ESortOrder.Asc : ESortOrder.Desc
+                            })
+                        }
+                    }}
+                >
                     <Table.Header>
-                        <Table.Column>TITLE</Table.Column>
+                        <Table.Column key="title" allowsSorting>
+                            TITLE
+                        </Table.Column>
                         <Table.Column>DESCRIPTION</Table.Column>
-                        <Table.Column>ID</Table.Column>
-                        <Table.Column>STATUS</Table.Column>
+                        <Table.Column key="$id" allowsSorting>
+                            ID
+                        </Table.Column>
+                        <Table.Column key="status" allowsSorting>
+                            STATUS
+                        </Table.Column>
                         <Table.Column hideHeader>ACTIONS</Table.Column>
                     </Table.Header>
                     <Table.Body loadingState={!tasks && isLoading}>
@@ -252,7 +392,9 @@ const AppTasksPage = () => {
                                 </Table.Cell>
                                 <Table.Cell>{task.id}</Table.Cell>
                                 <Table.Cell>
-                                    <Badge color={task.status === 'open' ? 'success' : 'error'}>{task.status}</Badge>
+                                    <Badge color={statusColorMap[task.status] || 'default'}>
+                                        {statusTextMap[task.status] || task.status}
+                                    </Badge>
                                 </Table.Cell>
                                 <Table.Cell>
                                     <Row justify="center" align="center">
