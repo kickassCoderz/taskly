@@ -2,6 +2,7 @@ import {
     createResourceBaseQueryKey,
     EResourceBaseQueryKeyType,
     ESortOrder,
+    TGetListResponseData,
     useDeleteOne,
     useGetList,
     useRealtimeSubscription
@@ -142,18 +143,34 @@ const AppTasksPage = () => {
                         operator: EFilterOperators.Contains,
                         field: 'title',
                         value: search
-                    },
-                    {
-                        operator: EFilterOperators.Eq,
-                        field: 'status',
-                        value: status === 'open' ? ['open', 'opened'] : (status as string)
                     }
                 ].filter(item => !!item.value)
             }
         },
         {
             enabled: !!session,
-            staleTime: Infinity
+            staleTime: Infinity,
+            select: useCallback(
+                (data: TGetListResponseData<TTask[]>): TGetListResponseData<TTask[]> => {
+                    if (!data) {
+                        return data
+                    }
+
+                    if (!status) {
+                        return data
+                    }
+
+                    const filteredData = data.data.filter(
+                        item => (statusTextMap[item.status] || item.status) === status
+                    )
+
+                    return {
+                        data: filteredData,
+                        total: filteredData.length
+                    }
+                },
+                [status]
+            )
         }
     )
 
