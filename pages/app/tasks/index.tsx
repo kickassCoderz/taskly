@@ -55,6 +55,16 @@ const defaultSort = {
     order: ESortOrder.Desc
 }
 
+const statusColorMap: Record<string, 'default' | 'primary' | 'secondary' | 'error' | 'success' | 'warning'> = {
+    open: 'success',
+    opened: 'success',
+    closed: 'error'
+}
+
+const statusTextMap: Record<string, string> = {
+    opened: 'open'
+}
+
 const AppTasksPage = () => {
     const queryClient = useQueryClient()
     const sessions = useSessions()
@@ -63,7 +73,7 @@ const AppTasksPage = () => {
     const [isGitHubProviderModalOpen, setGitHubProviderModalOpen] = useState(false)
     const [isGitLabProviderModalOpen, setGitLabProviderModalOpen] = useState(false)
     const [isImportPopperOpen, setIsImportPopperOpen] = useState(false)
-    const { field = defaultSort.field, order = defaultSort.order, search = '' } = router.query
+    const { field = defaultSort.field, order = defaultSort.order, search = '', status } = router.query
 
     const deleteMutation = useDeleteOne()
 
@@ -119,6 +129,11 @@ const AppTasksPage = () => {
                         operator: EFilterOperators.Contains,
                         field: 'title',
                         value: search
+                    },
+                    {
+                        operator: EFilterOperators.Eq,
+                        field: 'status',
+                        value: status === 'open' ? ['open', 'opened'] : (status as string)
                     }
                 ].filter(item => !!item.value)
             }
@@ -195,8 +210,43 @@ const AppTasksPage = () => {
                             </NextUILink>
                         </Link>
                         <Spacer x={0.5} />
-                        <Button auto flat size="xs" icon={<FilterIcon size={12} />}>
-                            Filter
+                        <Button
+                            auto
+                            flat
+                            size="xs"
+                            icon={<FilterIcon size={12} />}
+                            color={statusColorMap[status as string] || 'default'}
+                            onClick={() => {
+                                const nextStatus = {
+                                    open: 'closed',
+                                    closed: '',
+                                    undefined: 'open'
+                                }[status as string]
+
+                                if (typeof nextStatus === 'undefined') {
+                                    setQueryState({
+                                        status: 'open'
+                                    })
+                                } else {
+                                    setQueryState({
+                                        status: nextStatus
+                                    })
+                                }
+                            }}
+                        >
+                            Status
+                            {!!status && (
+                                <Text
+                                    as="span"
+                                    color="currentColor"
+                                    css={{
+                                        textTransform: 'capitalize'
+                                    }}
+                                >
+                                    :&nbsp;
+                                    {status}
+                                </Text>
+                            )}
                         </Button>
                         <Spacer x={0.5} />
                         <Spacer x={0.5} />
@@ -312,7 +362,9 @@ const AppTasksPage = () => {
                                 </Table.Cell>
                                 <Table.Cell>{task.id}</Table.Cell>
                                 <Table.Cell>
-                                    <Badge color={task.status === 'open' ? 'success' : 'error'}>{task.status}</Badge>
+                                    <Badge color={statusColorMap[task.status] || 'default'}>
+                                        {statusTextMap[task.status] || task.status}
+                                    </Badge>
                                 </Table.Cell>
                                 <Table.Cell>
                                     <Row justify="center" align="center">
