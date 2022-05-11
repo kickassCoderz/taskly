@@ -1,6 +1,7 @@
 import { forwardRef } from 'react'
 
 export type TSvgRootProps = {
+    viewBox?: string
     fill?: string
     size?: number
     width?: number
@@ -11,10 +12,10 @@ export type TSvgRootProps = {
 export type TSvgChildProps = Omit<TSvgRootProps, 'children'>
 
 const SvgRoot = forwardRef<SVGSVGElement, TSvgRootProps>(
-    ({ fill = 'currentColor', size, height, width, children }, ref) => {
+    ({ fill = 'currentColor', viewBox, size, height, width, children }, ref) => {
         return (
             <svg
-                viewBox="0 0 24 24"
+                viewBox={viewBox || '0 0 24 24'}
                 ref={ref}
                 fill={fill}
                 width={size || width || 24}
