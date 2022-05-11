@@ -51,6 +51,11 @@ import { EAuthProvider, TTask } from 'types'
 
 const allowMarkdownElement = () => false
 
+const defaultSort = {
+    field: '$id',
+    order: ESortOrder.Desc
+}
+
 const AppTasksPage = () => {
     const queryClient = useQueryClient()
     const sessions = useSessions()
@@ -59,6 +64,7 @@ const AppTasksPage = () => {
     const [isGitHubProviderModalOpen, setGitHubProviderModalOpen] = useState(false)
     const [isGitLabProviderModalOpen, setGitLabProviderModalOpen] = useState(false)
     const [isImportPopperOpen, setIsImportPopperOpen] = useState(false)
+    const { field = defaultSort.field, order = defaultSort.order } = router.query
 
     const deleteMutation = useDeleteOne()
 
@@ -76,6 +82,25 @@ const AppTasksPage = () => {
         }, [queryClient])
     })
 
+    const setQueryState = useCallback(
+        (values: Record<string, string>) => {
+            router.replace(
+                {
+                    pathname: router.pathname,
+                    query: {
+                        ...router.query,
+                        ...values
+                    }
+                },
+                undefined,
+                {
+                    shallow: true
+                }
+            )
+        },
+        [router]
+    )
+
     const { data: tasks, isLoading } = useGetList<TTask[], Error>(
         {
             resource: 'tasks',
@@ -86,8 +111,8 @@ const AppTasksPage = () => {
                 },
                 sort: [
                     {
-                        field: '$id',
-                        order: ESortOrder.Desc
+                        field: field as string,
+                        order: order as ESortOrder
                     }
                 ]
             }
@@ -222,12 +247,37 @@ const AppTasksPage = () => {
                 </Row>
             </AppFeatureBar>
             <AppPageContainer>
-                <Table aria-label="My Tasks" shadow={false}>
+                <Table
+                    aria-label="My Tasks"
+                    shadow={false}
+                    sortDescriptor={{
+                        column: field as string,
+                        direction: order === ESortOrder.Asc ? 'ascending' : 'descending'
+                    }}
+                    onSortChange={value => {
+                        if (!value.column || !value.direction) {
+                            setQueryState({
+                                ...defaultSort
+                            })
+                        } else {
+                            setQueryState({
+                                field: value.column.toString(),
+                                order: value.direction === 'ascending' ? ESortOrder.Asc : ESortOrder.Desc
+                            })
+                        }
+                    }}
+                >
                     <Table.Header>
-                        <Table.Column>TITLE</Table.Column>
+                        <Table.Column key="title" allowsSorting>
+                            TITLE
+                        </Table.Column>
                         <Table.Column>DESCRIPTION</Table.Column>
-                        <Table.Column>ID</Table.Column>
-                        <Table.Column>STATUS</Table.Column>
+                        <Table.Column key="$id" allowsSorting>
+                            ID
+                        </Table.Column>
+                        <Table.Column key="status" allowsSorting>
+                            STATUS
+                        </Table.Column>
                         <Table.Column hideHeader>ACTIONS</Table.Column>
                     </Table.Header>
                     <Table.Body loadingState={!tasks && isLoading}>
