@@ -47,7 +47,7 @@ import { useCallback, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { useQueryClient } from 'react-query'
 import { ESubscriptionEventTypes, TRealtimeParams } from 'services'
-import { EAuthProvider, TTask } from 'types'
+import { EAuthProvider, EFilterOperators, TTask } from 'types'
 
 const allowMarkdownElement = () => false
 
@@ -64,7 +64,7 @@ const AppTasksPage = () => {
     const [isGitHubProviderModalOpen, setGitHubProviderModalOpen] = useState(false)
     const [isGitLabProviderModalOpen, setGitLabProviderModalOpen] = useState(false)
     const [isImportPopperOpen, setIsImportPopperOpen] = useState(false)
-    const { field = defaultSort.field, order = defaultSort.order } = router.query
+    const { field = defaultSort.field, order = defaultSort.order, search = '' } = router.query
 
     const deleteMutation = useDeleteOne()
 
@@ -114,7 +114,14 @@ const AppTasksPage = () => {
                         field: field as string,
                         order: order as ESortOrder
                     }
-                ]
+                ],
+                filter: [
+                    {
+                        operator: EFilterOperators.Contains,
+                        field: 'title',
+                        value: search
+                    }
+                ].filter(item => !!item.value)
             }
         },
         {
@@ -171,6 +178,13 @@ const AppTasksPage = () => {
                             contentLeft={<SearchIcon size={16} />}
                             size="xs"
                             placeholder="Search"
+                            fullWidth
+                            value={search}
+                            onChange={event => {
+                                setQueryState({
+                                    search: event.target.value || ''
+                                })
+                            }}
                         />
                     </Col>
                     <Col css={{ display: 'flex', justifyContent: 'flex-end' }}>
