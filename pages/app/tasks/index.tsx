@@ -93,13 +93,26 @@ const AppTasksPage = () => {
 
     const setQueryState = useCallback(
         (values: Record<string, string>) => {
+            const newQuery = {
+                ...router.query,
+                ...values
+            }
+
             router.replace(
                 {
                     pathname: router.pathname,
-                    query: {
-                        ...router.query,
-                        ...values
-                    }
+                    query: Object.keys(newQuery).reduce((acc, item) => {
+                        const value = newQuery[item]
+
+                        if (!value) {
+                            return acc
+                        }
+
+                        return {
+                            ...acc,
+                            [item]: value
+                        }
+                    }, {})
                 },
                 undefined,
                 {
