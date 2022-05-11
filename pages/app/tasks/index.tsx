@@ -35,7 +35,6 @@ import {
     LinkIcon,
     ProviderButton,
     SearchIcon,
-    SortIcon,
     TrashIcon,
     TrelloIcon
 } from 'components'
@@ -200,9 +199,6 @@ const AppTasksPage = () => {
                             Filter
                         </Button>
                         <Spacer x={0.5} />
-                        <Button auto flat size="xs" icon={<SortIcon size={12} />}>
-                            Sort
-                        </Button>
                         <Spacer x={0.5} />
                         <Popover isOpen={isImportPopperOpen} onOpenChange={setIsImportPopperOpen}>
                             <Popover.Trigger>
