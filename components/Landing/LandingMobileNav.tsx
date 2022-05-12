@@ -109,7 +109,7 @@ const LandingMobileNav = () => {
                         <Spacer x={1} />
                         <Link passHref href="/app/tasks">
                             <Button as="a" color="gradient" onClick={handleToggleNav} css={{ width: '100%' }}>
-                                Play with Taskly
+                                Open Taskly
                             </Button>
                         </Link>
                     </>

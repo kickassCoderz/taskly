@@ -1,3 +1,4 @@
+import { useCheckAuth } from '@kickass-admin'
 import { Avatar, Button, Card, Container, Grid, Row, Spacer, Text } from '@nextui-org/react'
 import { Box, LandingLayout, LockIcon, MoonIcon, TimeIcon, ZapIcon } from 'components'
 import { useTheme } from 'hooks'
@@ -6,6 +7,7 @@ import Link from 'next/link'
 
 const HomePage = () => {
     const theme = useTheme()
+    const { isAuthenticated } = useCheckAuth()
 
     return (
         <Container
@@ -30,7 +32,7 @@ const HomePage = () => {
                         <b>Start below for free</b>.
                     </Text>
                     <Spacer y={2} />
-                    <Link passHref href="/auth/sign-up">
+                    <Link passHref href={isAuthenticated ? '/app/tasks' : '/auth/sign-up'}>
                         <Button size="lg" shadow auto color="gradient" css={{ width: 'fit-content' }}>
                             Get Started
                         </Button>
@@ -248,7 +250,7 @@ const HomePage = () => {
                         soon. Give as a ping on{' '}
                         <a href="https://github.com/kickassCoderz/taskly" target="_blank" rel="noreferrer">
                             GitHub
-                        </a>
+                        </a>{' '}
                         if you wish to contribute.
                         <Spacer y={1} />
                         Read more about Taskly from our{' '}
@@ -300,7 +302,7 @@ const HomePage = () => {
                         <Spacer y={1} />
                     </Box>
                     <Spacer y={2} />
-                    <Link passHref href="/auth/sign-up">
+                    <Link passHref href={isAuthenticated ? '/app/tasks' : '/auth/sign-up'}>
                         <Button size="lg" shadow auto color="gradient" css={{ width: 'fit-content' }}>
                             Get Started NOW!
                         </Button>
