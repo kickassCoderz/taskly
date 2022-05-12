@@ -1,6 +1,6 @@
 # Taskly - better way to manage your tasks
 
-**Taskly** is an app to better manage task across all of the different task/todo/issues/projects platforms. Developers (especially in open source) often use multiple websites like GitHub and Gitlab for working on their projects and contributing on others. There is also a fair share of project management tools that have their own tasks/todos. With Taskly all of those are merged into single interface for quick access and management. When you start using Taskly it will become a central hub for all of your tasks and give you more time to focus on actually doing your job. 
+**Taskly** is an app to better manage tasks across all of the different task/todo/issue/project platforms. Developers (especially in open source) often use multiple websites like GitHub and Gitlab to work on their projects and contribute to other. There is also a fair share of project management tools that have their own task/todo lists. With Taskly all of those are merged into single interface for quick access and management. When you start using Taskly it will become a central hub for all of your tasks and give you more time to focus on actually doing your job. 
 
 Crafted with [Appwrite](https://appwrite.io) and [Next.js](https://nextjs.org/) ❤️
 
