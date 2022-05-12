@@ -19,8 +19,7 @@ import {
     Row,
     Spacer,
     Table,
-    Text,
-    Tooltip
+    Text
 } from '@nextui-org/react'
 import {
     AppFeatureBar,
@@ -450,41 +449,39 @@ const AppTasksPage = () => {
                                         <Row justify="center" align="center">
                                             {task?.link && (
                                                 <Col css={{ d: 'flex' }}>
-                                                    <Tooltip content="Issue url">
-                                                        <Button
-                                                            as="a"
-                                                            href={task.link}
-                                                            rel="noopener noreferrer"
-                                                            target="_blank"
-                                                            auto
-                                                            light
-                                                            size="xs"
-                                                            icon={<LinkIcon size={20} />}
-                                                        />
-                                                    </Tooltip>
+                                                    <Button
+                                                        as="a"
+                                                        href={task.link}
+                                                        rel="noopener noreferrer"
+                                                        target="_blank"
+                                                        auto
+                                                        light
+                                                        size="xs"
+                                                        icon={<LinkIcon size={20} />}
+                                                    />
                                                 </Col>
                                             )}
                                             <Col css={{ d: 'flex' }}>
-                                                <Tooltip color="primary" content="Edit task">
-                                                    <Button
-                                                        auto
-                                                        light
-                                                        color="primary"
-                                                        size="xs"
-                                                        icon={<EditIcon size={20} />}
-                                                        onClick={() => {
-                                                            router.push({
-                                                                pathname: `/app/tasks/${task.id}`
-                                                            })
-                                                        }}
-                                                    />
-                                                </Tooltip>
+                                                <Link passHref href={`/app/tasks/${task.id}`}>
+                                                    <NextUILink>
+                                                        <Button
+                                                            href={`/app/tasks/${task.id}`}
+                                                            auto
+                                                            light
+                                                            color="primary"
+                                                            size="xs"
+                                                            icon={<EditIcon size={20} />}
+                                                        />
+                                                    </NextUILink>
+                                                </Link>
                                             </Col>
                                             <Col css={{ d: 'flex' }}>
-                                                <Tooltip
-                                                    css={{ whiteSpace: 'nowrap' }}
-                                                    content="Delete task"
+                                                <Button
+                                                    auto
+                                                    light
+                                                    size="xs"
                                                     color="error"
+                                                    icon={<TrashIcon size={20} />}
                                                     onClick={() => {
                                                         if (deleteMutation.isLoading) {
                                                             return
@@ -497,15 +494,7 @@ const AppTasksPage = () => {
                                                             }
                                                         })
                                                     }}
-                                                >
-                                                    <Button
-                                                        auto
-                                                        light
-                                                        size="xs"
-                                                        color="error"
-                                                        icon={<TrashIcon size={20} />}
-                                                    />
-                                                </Tooltip>
+                                                />
                                             </Col>
                                         </Row>
                                     </Table.Cell>
