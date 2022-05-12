@@ -28,6 +28,7 @@
         "react-hook-form": "^7.30.0",
         "react-markdown": "^8.0.3",
         "react-query": "^3.36.0",
+        "rooks": "^5.11.0",
         "zod": "^3.14.4"
     },
     "devDependencies": {

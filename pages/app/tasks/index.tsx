@@ -46,6 +46,7 @@ import { NextSeo } from 'next-seo'
 import { useCallback, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { useQueryClient } from 'react-query'
+import { useDebouncedValue } from 'rooks'
 import { ESubscriptionEventTypes, TRealtimeParams } from 'services'
 import { EAuthProvider, EFilterOperators, TTask } from 'types'
 
@@ -75,6 +76,7 @@ const AppTasksPage = () => {
     const [isGitLabProviderModalOpen, setGitLabProviderModalOpen] = useState(false)
     const [isImportPopperOpen, setIsImportPopperOpen] = useState(false)
     const { field = defaultSort.field, order = defaultSort.order, search = '', status } = router.query
+    const [debouncedSearch] = useDebouncedValue(search, 250)
 
     const deleteMutation = useDeleteOne()
 
@@ -142,7 +144,7 @@ const AppTasksPage = () => {
                     {
                         operator: EFilterOperators.Contains,
                         field: 'title',
-                        value: search
+                        value: debouncedSearch || ''
                     }
                 ].filter(item => !!item.value)
             }
