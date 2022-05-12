@@ -12,7 +12,7 @@ const AppSidebarAppBar = () => {
         <AppBar>
             <Row align="center" justify="space-between" gap={1}>
                 <Col css={{ display: 'flex', alignItems: 'center' }}>
-                    <Logo href="/app" size="medium" />
+                    <Logo href="/app/tasks" size="medium" />
                 </Col>
                 <Col css={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                     <Button

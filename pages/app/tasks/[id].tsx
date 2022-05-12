@@ -188,7 +188,10 @@ const AppTaskPage = () => {
                                 return (
                                     <>
                                         <Col>
-                                            <Text css={{ ml: '$2', mb: '$2', fontSize: '$xs' }} color="primary">
+                                            <Text
+                                                css={{ ml: '$2', mb: '$2', fontSize: '$xs', marginTop: 20 }}
+                                                color="primary"
+                                            >
                                                 Content
                                             </Text>
                                             {isPreviewEnabled ? (

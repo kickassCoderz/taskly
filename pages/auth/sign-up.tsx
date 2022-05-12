@@ -40,7 +40,7 @@ const SignUpPage = () => {
                 { ...formData, emailVerificationRedirect: redirectUrl },
                 {
                     onSuccess() {
-                        router.replace('/app')
+                        router.replace('/app/tasks')
                     },
                     onError(error) {
                         const appWriteError = error as AppwriteException
@@ -55,7 +55,7 @@ const SignUpPage = () => {
     )
 
     const handleLoginWithGithub = useCallback(() => {
-        const redirectUrl = new URL(`${window.location.origin}/app`).toString()
+        const redirectUrl = new URL(`${window.location.origin}/app/tasks`).toString()
         const errorUrl = new URL(window.location.toString()).toString()
 
         loginMutation.mutate({
@@ -69,7 +69,7 @@ const SignUpPage = () => {
     }, [loginMutation.mutate])
 
     const handleLoginWithGitlab = useCallback(() => {
-        const redirectUrl = new URL(`${window.location.origin}/app`).toString()
+        const redirectUrl = new URL(`${window.location.origin}/app/tasks`).toString()
         const errorUrl = new URL(window.location.toString()).toString()
 
         loginMutation.mutate({

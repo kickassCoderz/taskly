@@ -85,7 +85,7 @@ const LandingHeader = () => {
                                 </Button>
 
                                 <Spacer x={1} />
-                                <Link passHref href="/app">
+                                <Link passHref href="/app/tasks">
                                     <Button as="a" shadow auto>
                                         Play with Taskly
                                     </Button>

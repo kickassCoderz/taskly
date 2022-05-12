@@ -32,7 +32,7 @@ const SignInPage = () => {
                 { ...formData, loginType: ELoginType.EmailAndPass },
                 {
                     onSuccess() {
-                        const redirectPath = (router.query?.loginRedirect as string) || '/app'
+                        const redirectPath = (router.query?.loginRedirect as string) || '/app/tasks'
                         router.replace(redirectPath)
                     },
                     onError() {
@@ -47,7 +47,7 @@ const SignInPage = () => {
     )
 
     const handleLoginWithGithub = useCallback(() => {
-        const loginRedirectPath = router.query?.loginRedirect || '/app'
+        const loginRedirectPath = router.query?.loginRedirect || '/app/tasks'
         const redirectUrl = new URL(`${window.location.origin}${loginRedirectPath}`).toString()
         const errorUrl = new URL(window.location.toString()).toString()
 
@@ -62,7 +62,7 @@ const SignInPage = () => {
     }, [loginMutation.mutate, router.query])
 
     const handleLoginWithGitlab = useCallback(() => {
-        const loginRedirectPath = router.query?.loginRedirect || '/app'
+        const loginRedirectPath = router.query?.loginRedirect || '/app/tasks'
         const redirectUrl = new URL(`${window.location.origin}${loginRedirectPath}`).toString()
         const errorUrl = new URL(window.location.toString()).toString()
 
