@@ -27,6 +27,7 @@ import {
     AppPageAppBar,
     AppPageContainer,
     Badge,
+    Box,
     EditIcon,
     FilterIcon,
     GithubIcon,
@@ -451,8 +452,8 @@ const AppTasksPage = () => {
                                             </Table.Cell>
                                             <Table.Cell>
                                                 <Row justify="center" align="center">
-                                                    {task?.link && (
-                                                        <Col css={{ d: 'flex' }}>
+                                                    <Col css={{ d: 'flex' }}>
+                                                        {!!task?.link ? (
                                                             <Button
                                                                 as="a"
                                                                 href={task.link}
@@ -463,8 +464,11 @@ const AppTasksPage = () => {
                                                                 size="xs"
                                                                 icon={<LinkIcon size={20} />}
                                                             />
-                                                        </Col>
-                                                    )}
+                                                        ) : (
+                                                            <Box css={{ width: 20, height: 20 }} />
+                                                        )}
+                                                    </Col>
+
                                                     <Col css={{ d: 'flex' }}>
                                                         <Link passHref href={`/app/tasks/${task.id}`}>
                                                             <NextUILink>
@@ -541,7 +545,7 @@ const AppTasksPage = () => {
                                                         {statusTextMap[task.status] || task.status}
                                                     </Badge>
 
-                                                    {task?.link && (
+                                                    {!!task?.link && (
                                                         <Button
                                                             as="a"
                                                             href={task.link}
