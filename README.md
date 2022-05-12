@@ -4,6 +4,8 @@
 
 Crafted with [Appwrite](https://appwrite.io) and [Next.js](https://nextjs.org/) ❤️
 
+Created by [@Fazla-GroM](https://github.com/Fazla-GroM) and [@capJavert](https://github.com/capJavert) 🌈
+
 ## Development
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
