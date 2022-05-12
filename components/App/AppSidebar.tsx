@@ -43,14 +43,15 @@ const AppSidebar = () => {
                     backgroundColor: '$backgroundContrast',
                     maxWidth: '18rem',
                     flex: '1',
-                    position: 'absolute',
+                    position: 'fixed',
                     top: 0,
                     left: 0,
-                    height: '100vh',
+                    height: '100%',
                     boxShadow: isOpen ? '$md' : 'none',
                     transform: isOpen ? 'translateX(0)' : 'translateX(-18rem)',
 
                     '@md': {
+                        height: '100vh',
                         borderRight: '1px solid $border',
                         boxShadow: 'none',
                         position: isOpen ? 'sticky' : 'absolute'

@@ -97,9 +97,9 @@ const LandingMobileNav = () => {
                 {isAuthenticated ? (
                     <>
                         <Button
+                            css={{ width: '100%' }}
                             iconRight={logoutMutation.isLoading && <Loading color="currentColor" size="xs" />}
                             disabled={logoutMutation.isLoading}
-                            auto
                             color="gradient"
                             onClick={handleLogout}
                         >
@@ -108,7 +108,7 @@ const LandingMobileNav = () => {
 
                         <Spacer x={1} />
                         <Link passHref href="/app/tasks">
-                            <Button as="a" auto color="gradient" onClick={handleToggleNav}>
+                            <Button as="a" color="gradient" onClick={handleToggleNav} css={{ width: '100%' }}>
                                 Play with Taskly
                             </Button>
                         </Link>
@@ -116,13 +116,13 @@ const LandingMobileNav = () => {
                 ) : (
                     <>
                         <Link passHref href="/auth/sign-in">
-                            <Button as="a" auto color="gradient" onClick={handleToggleNav}>
+                            <Button as="a" color="gradient" onClick={handleToggleNav} css={{ width: '100%' }}>
                                 Sign In
                             </Button>
                         </Link>
                         <Spacer x={1} />
                         <Link passHref href="/auth/sign-up">
-                            <Button as="a" auto color="gradient" onClick={handleToggleNav}>
+                            <Button as="a" color="gradient" onClick={handleToggleNav} css={{ width: '100%' }}>
                                 Sign Up
                             </Button>
                         </Link>
