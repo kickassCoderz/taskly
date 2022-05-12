@@ -37,7 +37,19 @@ const App = ({ Component, pageProps }: TAppPropsWithLayout) => {
 
     return (
         <>
-            <DefaultSeo defaultTitle="Taskly" titleTemplate="Taskly | %s" description="Organize your tasks at ease!" />
+            <DefaultSeo
+                defaultTitle="Taskly"
+                titleTemplate="Taskly | %s"
+                description="Better way to manage your tasks"
+                openGraph={{
+                    images: [
+                        {
+                            url: 'https://taskly.kickass.website/og-image.jpg',
+                            alt: 'Taskly - better way to manage your tasks'
+                        }
+                    ]
+                }}
+            />
             <QueryClientProvider client={queryClient}>
                 <ReactQueryDevtools position="bottom-right" />
                 <Hydrate state={pageProps?.dehydratedState}>
