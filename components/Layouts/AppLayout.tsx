@@ -33,7 +33,7 @@ const AppLayout = ({ children }: TAppLayoutProps) => {
                     display="flex"
                     alignItems="center"
                     justify="center"
-                    css={{ height: '100vh' }}
+                    css={{ height: '100vh', backgroundColor: '$background' }}
                 >
                     <Loading size="xl" />
                 </Container>
@@ -46,7 +46,7 @@ const AppLayout = ({ children }: TAppLayoutProps) => {
                     gap={0}
                     display="flex"
                     direction="row"
-                    css={{ minHeight: '100vh', position: 'relative' }}
+                    css={{ minHeight: '100vh', position: 'relative', backgroundColor: '$background' }}
                 >
                     <AppSidebar />
                     <Container fluid display="flex" direction="column" responsive={false} gap={0} css={{ flex: '1' }}>

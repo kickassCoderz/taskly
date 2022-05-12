@@ -1,8 +1,8 @@
 import { useCheckAuth, useLogout } from '@kickass-admin'
 import { Button, Container, Loading, Row, Spacer, Switch, SwitchEvent } from '@nextui-org/react'
 import { Logo } from 'components/Base'
-import { MoonIcon, SunIcon } from 'components/Icons'
-import { useTheme } from 'hooks'
+import { MenuRightIcon, MoonIcon, SunIcon } from 'components/Icons'
+import { useAppNavigation, useTheme } from 'hooks'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -11,6 +11,7 @@ const LandingHeader = () => {
     const { isDark, setTheme } = useTheme()
     const { isAuthenticated } = useCheckAuth()
     const logoutMutation = useLogout()
+    const { toggleNav } = useAppNavigation()
 
     useEffect(() => {
         const isBrowser = typeof window !== 'undefined'
@@ -43,6 +44,8 @@ const LandingHeader = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [logoutMutation.mutate])
 
+    const handleToggleNav = useCallback(() => toggleNav(), [toggleNav])
+
     return (
         <Container
             as="header"
@@ -53,7 +56,7 @@ const LandingHeader = () => {
                 py: '$8',
                 position: 'sticky',
                 top: 0,
-                zIndex: '$max',
+                zIndex: 1000,
                 backgroundColor: isDetached ? '$landingHeaderBackground' : 'transparent',
                 backdropFilter: isDetached ? 'saturate(180%) blur(10px)' : 'none',
                 boxShadow: isDetached ? '0px 5px 20px -5px rgba(2, 1, 1, 0.1)' : 'none',
@@ -61,7 +64,27 @@ const LandingHeader = () => {
             }}
         >
             <Container fluid>
-                <Row fluid justify="center" align="center">
+                <Row fluid align="center" justify="space-between" css={{ '@xs': { display: 'none' } }}>
+                    <Logo href="/" size="medium" />
+                    <Button
+                        onClick={handleToggleNav}
+                        size="sm"
+                        light
+                        auto
+                        icon={<MenuRightIcon size={24} />}
+                        css={{ padding: 0, width: '32px' }}
+                    />
+                </Row>
+                <Row
+                    fluid
+                    align="center"
+                    css={{
+                        display: 'none',
+                        '@xs': {
+                            display: 'flex'
+                        }
+                    }}
+                >
                     <Logo href="/" />
 
                     <Row fluid justify="flex-end" align="center">
