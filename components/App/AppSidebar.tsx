@@ -41,7 +41,6 @@ const AppSidebar = () => {
                 css={{
                     zIndex: 11000,
                     backgroundColor: '$backgroundContrast',
-                    borderRight: '1px solid $border',
                     maxWidth: '18rem',
                     flex: '1',
                     position: 'absolute',
@@ -52,6 +51,7 @@ const AppSidebar = () => {
                     transform: isOpen ? 'translateX(0)' : 'translateX(-18rem)',
 
                     '@md': {
+                        borderRight: '1px solid $border',
                         boxShadow: 'none',
                         position: isOpen ? 'sticky' : 'absolute'
                     }

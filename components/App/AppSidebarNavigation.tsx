@@ -18,7 +18,7 @@ const AppSidebarNavigation = memo(() => {
             <Row gap={1} fluid={false}>
                 <Divider y={1} />
             </Row>
-            <Grid.Container as="ul" gap={0}>
+            <Grid.Container as="ul" gap={0} css={{ margin: 0 }}>
                 <Grid as="li" xs={12}>
                     <SidebarNavLink icon={<HomeIcon size={18} />} label="Home" href="/app" exact />
                 </Grid>
