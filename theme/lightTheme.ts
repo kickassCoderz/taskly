@@ -5,6 +5,10 @@ const lightTheme = createTheme({
     theme: {
         colors: {
             landingHeaderBackground: 'hsla(0,0%,100%,0.8)'
+        },
+        fonts: {
+            mono: 'Inter',
+            sans: 'Inter'
         }
     }
 })

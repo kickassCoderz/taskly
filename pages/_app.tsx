@@ -9,7 +9,7 @@ import { Hydrate, QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
 import { authService, dataService, realtimeService } from 'services'
 
-import { themeProviderValues } from '../theme'
+import { injectGlobalStyles, themeProviderValues } from '../theme'
 
 type TNextPageWithLayout = NextPage & {
     getLayout?: (_page: React.ReactElement) => JSX.Element
@@ -20,6 +20,8 @@ type TAppPropsWithLayout = AppProps & {
 }
 
 const App = ({ Component, pageProps }: TAppPropsWithLayout) => {
+    injectGlobalStyles()
+
     const [queryClient] = useState(
         () =>
             new QueryClient({
