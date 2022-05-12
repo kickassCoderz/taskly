@@ -102,7 +102,7 @@ const LandingHeader = () => {
                                     disabled={logoutMutation.isLoading}
                                     shadow={isDetached}
                                     auto
-                                    color="gradient"
+                                    color="primary"
                                     onClick={handleLogout}
                                 >
                                     Sign Out
@@ -110,21 +110,21 @@ const LandingHeader = () => {
 
                                 <Spacer x={1} />
                                 <Link passHref href="/app/tasks">
-                                    <Button as="a" shadow={isDetached} auto color="gradient">
-                                        Play with Taskly
+                                    <Button as="a" shadow={isDetached} auto color="primary">
+                                        Open Taskly
                                     </Button>
                                 </Link>
                             </>
                         ) : (
                             <>
                                 <Link passHref href="/auth/sign-in">
-                                    <Button as="a" shadow={isDetached} auto color="gradient">
+                                    <Button as="a" shadow={isDetached} auto color="primary">
                                         Sign In
                                     </Button>
                                 </Link>
                                 <Spacer x={1} />
                                 <Link passHref href="/auth/sign-up">
-                                    <Button as="a" shadow={isDetached} auto color="gradient">
+                                    <Button as="a" shadow={isDetached} auto color="primary">
                                         Sign Up
                                     </Button>
                                 </Link>

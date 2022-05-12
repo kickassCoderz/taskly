@@ -32,11 +32,11 @@ const LandingFooter = () => {
                     &nbsp;
                     <NextUILink
                         css={{ fontSize: '$tiny' }}
-                        href="https://nextui.org/"
+                        href="https://nextjs.org/"
                         rel="noopener noreferrer"
                         target="_blank"
                     >
-                        NextUI
+                        Next.js
                     </NextUILink>
                     &nbsp;
                     <Text small>❤️</Text>
