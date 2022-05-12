@@ -1,5 +1,6 @@
 import { useCheckAuth, useLogout } from '@kickass-admin'
-import { Button, Container, Loading, Row, Spacer, Switch, SwitchEvent, Text } from '@nextui-org/react'
+import { Button, Container, Loading, Row, Spacer, Switch, SwitchEvent } from '@nextui-org/react'
+import { Logo } from 'components/Base'
 import { MoonIcon, SunIcon } from 'components/Icons'
 import { useTheme } from 'hooks'
 import Link from 'next/link'
@@ -49,6 +50,7 @@ const LandingHeader = () => {
             responsive={false}
             gap={0}
             css={{
+                py: '$8',
                 position: 'sticky',
                 top: 0,
                 zIndex: '$max',
@@ -59,15 +61,10 @@ const LandingHeader = () => {
         >
             <Container fluid>
                 <Row fluid justify="center" align="center">
-                    <Link passHref href="/">
-                        <Text h1 css={{ cursor: 'pointer' }}>
-                            Taskly
-                        </Text>
-                    </Link>
+                    <Logo href="/" />
 
                     <Row fluid justify="flex-end" align="center">
                         <Switch
-                            color="secondary"
                             onChange={handleThemeChange}
                             checked={isDark}
                             iconOn={<MoonIcon />}
@@ -77,7 +74,6 @@ const LandingHeader = () => {
                         {isAuthenticated ? (
                             <>
                                 <Button
-                                    color="secondary"
                                     iconRight={logoutMutation.isLoading && <Loading color="currentColor" size="xs" />}
                                     disabled={logoutMutation.isLoading}
                                     shadow
@@ -90,7 +86,7 @@ const LandingHeader = () => {
 
                                 <Spacer x={1} />
                                 <Link passHref href="/app">
-                                    <Button color="secondary" as="a" shadow auto>
+                                    <Button as="a" shadow auto>
                                         Play with Taskly
                                     </Button>
                                 </Link>

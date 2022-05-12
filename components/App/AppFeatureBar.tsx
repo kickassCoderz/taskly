@@ -12,12 +12,12 @@ const AppFeatureBar = ({ children }: TAppFeatureBarProps) => {
             responsive={false}
             display="flex"
             css={{
+                py: '$3',
                 position: 'sticky',
                 top: '$17',
                 backgroundColor: '$backgroundContrast',
                 borderBottom: '1px solid $border',
-                zIndex: '$max',
-                height: '$13'
+                zIndex: '$max'
             }}
         >
             {children}

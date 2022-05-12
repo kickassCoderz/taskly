@@ -1,4 +1,5 @@
-import { Button, Col, Row, Text } from '@nextui-org/react'
+import { Button, Col, Row } from '@nextui-org/react'
+import { Logo } from 'components/Base'
 import { ChevronsLeftIcon } from 'components/Icons'
 import { useAppNavigation } from 'hooks'
 
@@ -11,7 +12,7 @@ const AppSidebarAppBar = () => {
         <AppBar>
             <Row align="center" justify="space-between" gap={1}>
                 <Col css={{ display: 'flex', alignItems: 'center' }}>
-                    <Text h4>Taskly</Text>
+                    <Logo href="/app" size="medium" />
                 </Col>
                 <Col css={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                     <Button

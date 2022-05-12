@@ -33,6 +33,7 @@ const AppCurrentUser = ({ name, image }: TAppCurrentUserProps) => {
         <Popover>
             <Popover.Trigger>
                 <User
+                    size="md"
                     pointer
                     bordered
                     color="primary"
@@ -41,6 +42,7 @@ const AppCurrentUser = ({ name, image }: TAppCurrentUserProps) => {
                     src={image}
                     altText={name}
                     css={{
+                        padding: 0,
                         cursor: 'pointer',
                         transition: 'opacity 0.25s ease',
                         '&:hover': {
