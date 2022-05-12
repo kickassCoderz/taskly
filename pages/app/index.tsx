@@ -1,8 +1,9 @@
-import { Grid, Spacer, Text, Tooltip } from '@nextui-org/react'
+import { Spacer, Text, Tooltip } from '@nextui-org/react'
 import {
     AppLayout,
     AppPageAppBar,
     AppPageContainer,
+    Box,
     GithubIcon,
     GitlabIcon,
     ProviderButton,
@@ -21,15 +22,38 @@ const AppHomePage = () => {
             <NextSeo title="Home" />
             <AppPageAppBar title="Home" />
             <AppPageContainer>
-                <Grid.Container gap={7}>
-                    <Grid xs={12} alignItems="center" justify="center">
-                        <TasksIlustration />
-                    </Grid>
-                    <Grid xs={12} direction="column" alignItems="center" justify="center">
-                        <Text h2>Ready to kick some of your tasks?</Text>
-                        <Text size={24}>Start by connecting some of your services</Text>
-                    </Grid>
-                    <Grid xs={12} alignItems="center" justify="center">
+                <Box
+                    css={{
+                        p: '$lg',
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexDirection: 'column'
+                    }}
+                >
+                    <TasksIlustration />
+                    <Spacer y={2} />
+                    <Text h2 css={{ textAlign: 'center' }}>
+                        Ready to kick some of your tasks?
+                    </Text>
+                    <Text size={24} css={{ textAlign: 'center' }}>
+                        Start by connecting some of your services
+                    </Text>
+                    <Spacer y={2} />
+                    <Box
+                        css={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexDirection: 'column',
+
+                            '@xs': {
+                                flexDirection: 'row'
+                            }
+                        }}
+                    >
                         <ProviderButton
                             iconComponent={GithubIcon}
                             provider={EAuthProvider.Github}
@@ -79,8 +103,8 @@ const AppHomePage = () => {
                                 disabled
                             />
                         </Tooltip>
-                    </Grid>
-                </Grid.Container>
+                    </Box>
+                </Box>
             </AppPageContainer>
         </>
     )
