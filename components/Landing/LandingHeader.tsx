@@ -56,7 +56,8 @@ const LandingHeader = () => {
                 zIndex: '$max',
                 backgroundColor: isDetached ? '$landingHeaderBackground' : 'transparent',
                 backdropFilter: isDetached ? 'saturate(180%) blur(10px)' : 'none',
-                boxShadow: isDetached ? '0px 5px 20px -5px rgba(2, 1, 1, 0.1)' : 'none'
+                boxShadow: isDetached ? '0px 5px 20px -5px rgba(2, 1, 1, 0.1)' : 'none',
+                transition: 'background-color 0.25s ease-in-out'
             }}
         >
             <Container fluid>
@@ -76,9 +77,9 @@ const LandingHeader = () => {
                                 <Button
                                     iconRight={logoutMutation.isLoading && <Loading color="currentColor" size="xs" />}
                                     disabled={logoutMutation.isLoading}
-                                    shadow
+                                    shadow={isDetached}
                                     auto
-                                    ghost
+                                    color="gradient"
                                     onClick={handleLogout}
                                 >
                                     Sign Out
@@ -86,7 +87,7 @@ const LandingHeader = () => {
 
                                 <Spacer x={1} />
                                 <Link passHref href="/app/tasks">
-                                    <Button as="a" shadow auto>
+                                    <Button as="a" shadow={isDetached} auto color="gradient">
                                         Play with Taskly
                                     </Button>
                                 </Link>
@@ -94,13 +95,13 @@ const LandingHeader = () => {
                         ) : (
                             <>
                                 <Link passHref href="/auth/sign-in">
-                                    <Button as="a" shadow auto ghost>
+                                    <Button as="a" shadow={isDetached} auto color="gradient">
                                         Sign In
                                     </Button>
                                 </Link>
                                 <Spacer x={1} />
                                 <Link passHref href="/auth/sign-up">
-                                    <Button as="a" shadow auto>
+                                    <Button as="a" shadow={isDetached} auto color="gradient">
                                         Sign Up
                                     </Button>
                                 </Link>
