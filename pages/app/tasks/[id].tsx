@@ -120,12 +120,17 @@ const AppTaskPage = () => {
     return (
         <>
             <NextSeo title={pageTitle} />
-            <AppPageAppBar title={pageTitle} />
+            <AppPageAppBar title="My Tasks" />
             <AppFeatureBar>
                 <Row gap={1} align="center" justify="center">
-                    <Col css={{ display: 'flex', justifyContent: 'flex-start' }}></Col>
+                    <Col css={{ display: 'flex', justifyContent: 'flex-start' }}>
+                        <Text small weight="bold">
+                            {task?.title}
+                        </Text>
+                    </Col>
                     <Col css={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <Button
+                            flat
                             size="xs"
                             onClick={() => {
                                 setPreviewEnabled(current => !current)
@@ -137,6 +142,7 @@ const AppTaskPage = () => {
                         <Spacer x={0.5} />
                         <Button
                             disabled={updateMutation.isLoading}
+                            color="gradient"
                             size="xs"
                             iconRight={updateMutation.isLoading && <Loading color="currentColor" size="sm" />}
                             type="submit"
@@ -148,16 +154,21 @@ const AppTaskPage = () => {
                 </Row>
             </AppFeatureBar>
             <AppPageContainer>
-                <Grid.Container gap={2}>
-                    <Grid as="form">
-                        {!!updateMutation.error && (
-                            <>
-                                <Text h5 color="error">
-                                    Error: {updateMutation.error.message}
-                                </Text>
-                                <Spacer y={1.2} />
-                            </>
-                        )}
+                <Grid.Container
+                    gap={1}
+                    direction="column"
+                    justify="center"
+                    as="form"
+                    css={{ margin: 0, width: 'auto' }}
+                >
+                    {!!updateMutation.error && (
+                        <Grid sm={12}>
+                            <Text h5 color="error">
+                                Error: {updateMutation.error.message}
+                            </Text>
+                        </Grid>
+                    )}
+                    <Grid xs={12}>
                         <Input
                             {...register('title')}
                             type="text"
@@ -168,7 +179,8 @@ const AppTaskPage = () => {
                             label="Title"
                             placeholder="Title"
                         />
-                        <Spacer y={1.2} />
+                    </Grid>
+                    <Grid xs={12}>
                         <Controller
                             control={control}
                             name="content"
@@ -176,7 +188,7 @@ const AppTaskPage = () => {
                                 return (
                                     <>
                                         <Col>
-                                            <Text style={{ marginLeft: 10 }} color="primary">
+                                            <Text css={{ ml: '$2', mb: '$2', fontSize: '$xs' }} color="primary">
                                                 Content
                                             </Text>
                                             {isPreviewEnabled ? (
@@ -194,7 +206,7 @@ const AppTaskPage = () => {
                                                 <CodeMirror
                                                     theme={theme.isDark ? 'dark' : 'light'}
                                                     value={value || ''}
-                                                    width="100vw"
+                                                    width="100%"
                                                     maxWidth="800px"
                                                     height="400px"
                                                     extensions={[markdown({})]}
