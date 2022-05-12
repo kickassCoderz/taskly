@@ -1,5 +1,6 @@
 import { Container } from '@nextui-org/react'
-import { LandingFooter, LandingHeader } from 'components/Landing'
+import { LandingFooter, LandingHeader, LandingMobileNav } from 'components/Landing'
+import { AppNavigationProvider } from 'providers'
 
 type TLandingLayoutProps = {
     children: JSX.Element
@@ -7,21 +8,24 @@ type TLandingLayoutProps = {
 
 const LandingLayout = ({ children }: TLandingLayoutProps) => {
     return (
-        <Container
-            fluid
-            responsive={false}
-            gap={0}
-            display="flex"
-            direction="column"
-            css={{
-                minHeight: '100vh',
-                position: 'relative'
-            }}
-        >
-            <LandingHeader />
-            {children}
-            <LandingFooter />
-        </Container>
+        <AppNavigationProvider>
+            <LandingMobileNav />
+            <Container
+                fluid
+                responsive={false}
+                gap={0}
+                display="flex"
+                direction="column"
+                css={{
+                    minHeight: '100vh',
+                    position: 'relative'
+                }}
+            >
+                <LandingHeader />
+                {children}
+                <LandingFooter />
+            </Container>
+        </AppNavigationProvider>
     )
 }
 

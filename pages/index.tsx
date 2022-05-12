@@ -17,7 +17,7 @@ const HomePage = () => {
             }}
         >
             <Spacer y={5} />
-            <Grid.Container gap={2}>
+            <Grid.Container gap={2} css={{ padding: 0 }}>
                 <Grid xs={12} md={5} direction="column" justify="center">
                     <Text h1>Simplify your workflow and get more done.</Text>
                     <Spacer y={0.5} />
@@ -42,7 +42,7 @@ const HomePage = () => {
                 </Grid>
             </Grid.Container>
             <Spacer y={10} />
-            <Grid.Container gap={2}>
+            <Grid.Container gap={2} css={{ padding: 0 }}>
                 <Grid xs={12} md={3}>
                     <Card
                         as="article"
@@ -144,6 +144,7 @@ const HomePage = () => {
             <Grid.Container
                 gap={2}
                 css={{
+                    padding: '0',
                     backgroundColor: '$landingHeaderBackground',
                     backdropFilter: 'saturate(180%) blur(10px)',
                     borderRadius: '$base',
