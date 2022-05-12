@@ -7,7 +7,17 @@ type TLandingLayoutProps = {
 
 const LandingLayout = ({ children }: TLandingLayoutProps) => {
     return (
-        <Container fluid responsive={false} gap={0} display="flex" direction="column" css={{ minHeight: '100vh' }}>
+        <Container
+            fluid
+            responsive={false}
+            gap={0}
+            display="flex"
+            direction="column"
+            css={{
+                minHeight: '100vh',
+                position: 'relative'
+            }}
+        >
             <LandingHeader />
             {children}
             <LandingFooter />
