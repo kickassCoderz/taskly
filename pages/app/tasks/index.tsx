@@ -75,7 +75,8 @@ const AppTasksPage = () => {
     const [isGitHubProviderModalOpen, setGitHubProviderModalOpen] = useState(false)
     const [isGitLabProviderModalOpen, setGitLabProviderModalOpen] = useState(false)
     const [isImportPopperOpen, setIsImportPopperOpen] = useState(false)
-    const { field = defaultSort.field, order = defaultSort.order, search = '', status } = router.query
+    const { field = defaultSort.field, order = defaultSort.order, status } = router.query
+    const [search, setSearch] = useState('')
     const [debouncedSearch] = useDebouncedValue(search, 250)
 
     const deleteMutation = useDeleteOne()
@@ -125,6 +126,13 @@ const AppTasksPage = () => {
         },
         [router]
     )
+
+    useEffect(() => {
+        setQueryState({
+            search
+        })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [search])
 
     const { data: tasks, isLoading } = useGetList<TTask[], Error>(
         {
@@ -227,9 +235,7 @@ const AppTasksPage = () => {
                             fullWidth
                             value={search}
                             onChange={event => {
-                                setQueryState({
-                                    search: event.target.value || ''
-                                })
+                                setSearch(event.target.value || '')
                             }}
                         />
                     </Col>
